@@ -4,23 +4,28 @@ const db = require('./database.js')
 
 const createWindow = () => {
     const win = new BrowserWindow({
-        width: 800,
-        height: 600,
+        width: 1000,
+        height: 800,
         webPreferences: {
             preload: path.join(__dirname, 'preload.js')
         }
     })
 
-    win.loadFile('index.html')
+    win.loadFile('login.html')
 }
 
 app.whenReady().then(() => {
+    const userDataPath = app.getPath('userData');
+
+    // Initialize DB early so it is ready
+    db.initDb(userDataPath);
+
     ipcMain.handle('get-items', () => {
-        return db.getItems();
+        return db.getItems(userDataPath);
     });
 
     ipcMain.handle('add-item', (event, item) => {
-        return db.addItem(item.name, item.quantity, item.price);
+        return db.addItem(userDataPath, item.name, item.quantity, item.price);
     });
 
     createWindow()

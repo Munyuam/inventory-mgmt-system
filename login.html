@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - Inventory Management System</title>
+  <link rel="stylesheet" href="./login-styles.css">
+  <link rel="stylesheet" href="./splash-styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600&display=swap" rel="stylesheet">
+  <!-- Content Security Policy: updated to allow inline scripts and Clerk CDN if uncommented -->
+  <meta http-equiv="Content-Security-Policy"
+    content="script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src * data:;">
+  <script>
+    // Inline script to prevent FOUC (Flash of Unstyled Content) by checking theme before render
+    const savedTheme = localStorage.getItem('app-theme');
+    if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      document.documentElement.setAttribute('data-theme', 'dark');
+    } else {
+      document.documentElement.setAttribute('data-theme', 'light');
+    }
+  </script>
+</head>
+
+<body>
+  <div class="split-layout" id="main-content">
+
+    <!-- LEFT SIDE: Image Panel -->
+    <div class="image-panel">
+      <!-- Structural image element (managed via CSS object-fit) -->
+      <img src="./images/man-inventory.jpg" alt="inventory background" class="panel-bg-img">
+
+      <div class="image-overlay">
+        <h2>Efficient. Seamless. Robust.</h2>
+        <p>Your complete inventory solution.</p>
+      </div>
+    </div>
+
+    <!-- RIGHT SIDE: Auth Panel -->
+    <div class="form-panel">
+      <!-- Theme Toggle Button -->
+      <button class="theme-toggle" id="theme-toggle" aria-label="Toggle Theme">
+        <svg id="icon-sun" class="theme-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="5"></circle>
+          <line x1="12" y1="1" x2="12" y2="3"></line>
+          <line x1="12" y1="21" x2="12" y2="23"></line>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+          <line x1="1" y1="12" x2="3" y2="12"></line>
+          <line x1="21" y1="12" x2="23" y2="12"></line>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+        </svg>
+        <svg id="icon-moon" class="theme-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none;">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+        </svg>
+      </button>
+
+      <div class="form-wrapper" id="custom-ui">
+
+        <div class="app-brand">
+          <h1>Inventory System</h1>
+          <p class="subtitle">Secure access portal</p>
+        </div>
+
+        <div class="auth-tabs">
+          <button class="tab-btn active" id="btn-login" type="button">Log In</button>
+          <button class="tab-btn" id="btn-signup" type="button">Sign Up</button>
+        </div>
+
+        <form id="auth-form" class="auth-form">
+          <div class="input-group" id="username-group">
+            <label for="username">Username</label>
+            <input type="text" id="username" placeholder="johndoe" required>
+            <span class="help-text">Enter your unique username</span>
+          </div>
+
+          <!-- Email is only needed during signup, not for login -->
+          <div class="input-group" id="email-group" style="display: none;">
+            <label for="email">Email</label>
+            <input type="email" id="email" placeholder="name@company.com">
+          </div>
+
+          <div class="input-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" placeholder="••••••••" required>
+          </div>
+
+          <div class="form-actions">
+            <button type="submit" class="submit-btn" id="submit-btn" aria-live="polite">Continue</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- CLERK INTEGRATION PLACEHOLDER -->
+      <!--
+      <div id="clerk-ui" style="display: none; width: 100%;">
+        <div id="sign-in"></div>
+      </div>
+      -->
+
+    </div>
+
+  </div>
+
+  <script src="./login.js"></script>
+</body>
+
+</html>
