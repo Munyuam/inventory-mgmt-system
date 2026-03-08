@@ -42,6 +42,23 @@
     display: flex;
     flex-direction: column;
     gap: 8px;
+    flex: 1;
+}
+
+.sidebar-footer {
+    border-top: 1px solid var(--border-color);
+    padding-top: 16px;
+    margin-top: auto;
+}
+
+.logout-link:hover {
+    background-color: #fef2f2;
+    color: #ef4444;
+}
+
+[data-theme='dark'] .logout-link:hover {
+    background-color: rgba(239, 68, 68, 0.1);
+    color: #f87171;
 }
 
 .nav-item {
@@ -115,7 +132,6 @@
     gap: 12px;
     padding: 6px 12px;
     padding-left: 16px;
-    border-left: 1px solid var(--border-color);
     cursor: pointer;
     position: relative;
     border-radius: 8px;
@@ -311,18 +327,27 @@
     color: var(--text-main);
 }
 
-/* Content Grid (Form + Table) */
+/* Content Grid (Analytics) */
 .content-grid {
     display: grid;
-    grid-template-columns: 350px 1fr;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
     gap: 24px;
 }
 
 .content-card {
     background-color: var(--bg-form);
     border: 1px solid var(--border-color);
-    border-radius: 12px;
+    border-radius: 16px;
     padding: 24px;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.chart-container {
+    position: relative;
+    height: 350px;
+    width: 100%;
 }
 
 .card-header {
@@ -401,4 +426,28 @@
         border-right: none;
         border-bottom: 1px solid var(--border-color);
     }
+}
+/* Analytics Badges & Layouts */
+.badge {
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+}
+
+.badge-warning {
+    background-color: rgba(245, 158, 11, 0.15);
+    color: #f59e0b;
+}
+
+.badge-success {
+    background-color: rgba(16, 185, 129, 0.15);
+    color: #10b981;
+}
+
+/* Ensure Charts are legible in Dark Mode */
+[data-theme='dark'] .chart-container canvas {
+    filter: drop-shadow(0 0 5px rgba(255,255,255,0.05));
 }

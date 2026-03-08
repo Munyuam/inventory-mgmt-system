@@ -14,7 +14,9 @@ const initDb = (userDataPath) => {
       CREATE TABLE IF NOT EXISTS items (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT NOT NULL,
+        category TEXT DEFAULT 'General',
         quantity INTEGER NOT NULL DEFAULT 0,
+        issued_count INTEGER NOT NULL DEFAULT 0,
         price REAL NOT NULL DEFAULT 0.0
       )
     `);
@@ -27,9 +29,9 @@ module.exports = {
     if (!db) initDb(userDataPath);
     return db.prepare('SELECT * FROM items').all();
   },
-  addItem: (userDataPath, name, quantity, price) => {
+  addItem: (userDataPath, name, quantity, price, category = 'General') => {
     if (!db) initDb(userDataPath);
-    const stmt = db.prepare('INSERT INTO items (name, quantity, price) VALUES (?, ?, ?)');
-    return stmt.run(name, quantity, price);
+    const stmt = db.prepare('INSERT INTO items (name, quantity, price, category) VALUES (?, ?, ?, ?)');
+    return stmt.run(name, quantity, price, category);
   }
 };
