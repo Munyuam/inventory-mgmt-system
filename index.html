@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Inventory Management System</title>
+    <!-- Content Security Policy to secure Electron -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'">
+    <style>
+        body {
+            font-family: sans-serif;
+            padding: 20px;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        th,
+        td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        input,
+        button {
+            padding: 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Inventory Management System</h1>
+
+    <div class="form-group">
+        <h3>Add New Item</h3>
+        <input type="text" id="itemName" placeholder="Item Name" required>
+        <input type="number" id="itemQuantity" placeholder="Quantity" value="0" required>
+        <input type="number" step="0.01" id="itemPrice" placeholder="Price" value="0.00" required>
+        <button id="addItemBtn">Add Item</button>
+    </div>
+
+    <h3>Inventory List</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Quantity</th>
+                <th>Price</th>
+            </tr>
+        </thead>
+        <tbody id="inventoryList">
+            <!-- Items will be populated here by renderer.js -->
+        </tbody>
+    </table>
+
+    <script src="./renderer.js"></script>
+</body>
+
+</html>
