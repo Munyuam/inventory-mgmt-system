@@ -7,12 +7,12 @@
     <title>Inventory Management System - Dashboard</title>
     <!-- Content Security Policy -->
     <meta http-equiv="Content-Security-Policy"
-        content="script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com;">
+        content="script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; connect-src 'self';">
 
     <!-- Link styles from login for base branding/variables and new dashboard specific styles -->
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="./login-styles.css">
-    <link rel="stylesheet" href="./dashboard-styles.css">
+    <link rel="stylesheet" href="../public/styles/login-styles.css">
+    <link rel="stylesheet" href="../public/styles/dashboard-styles.css">
 
     <!-- Chart.js for Analytics -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -29,7 +29,7 @@
     <div class="dashboard-layout">
 
         <!-- Sidebar Navigation -->
-        <aside class="sidebar">
+        <aside class="sidebar" id="sidebar">
             <div class="brand">
                 <h2>
                     <svg class="brand-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
@@ -40,8 +40,14 @@
                         <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
                         <line x1="12" y1="22.08" x2="12" y2="12"></line>
                     </svg>
-                    Inventory
+                    <span class="brand-text">Inventory</span>
                 </h2>
+                <button id="sidebar-toggle" class="sidebar-toggle-btn" title="Toggle Sidebar">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="m15 18-6-6 6-6" />
+                    </svg>
+                </button>
             </div>
 
             <nav class="nav-links">
@@ -53,7 +59,7 @@
                         <rect x="14" y="14" width="7" height="7"></rect>
                         <rect x="3" y="14" width="7" height="7"></rect>
                     </svg>
-                    Dashboard
+                    <span class="nav-text">Dashboard</span>
                 </a>
                 <a href="#" class="nav-item" data-view="items">
                     <svg class="nav-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -62,14 +68,14 @@
                             d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z">
                         </path>
                     </svg>
-                    Items
+                    <span class="nav-text">Items</span>
                 </a>
                 <a href="#" class="nav-item" data-view="activity">
                     <svg class="nav-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                         stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
                     </svg>
-                    Stock Activity
+                    <span class="nav-text">Activity</span>
                 </a>
                 <a href="#" class="nav-item" data-view="summary">
                     <svg class="nav-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -80,7 +86,7 @@
                         <line x1="16" y1="17" x2="8" y2="17"></line>
                         <polyline points="10 9 9 9 8 9"></polyline>
                     </svg>
-                    Stock Summary
+                    <span class="nav-text">Summary</span>
                 </a>
                 <a href="#" class="nav-item" data-view="reports">
                     <svg class="nav-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -90,7 +96,7 @@
                         <line x1="8" y1="2" x2="8" y2="6"></line>
                         <line x1="3" y1="10" x2="21" y2="10"></line>
                     </svg>
-                    Weekly Reports
+                    <span class="nav-text">Reports</span>
                 </a>
                 <a href="#" class="nav-item" data-view="settings">
                     <svg class="nav-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -100,7 +106,7 @@
                             d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z">
                         </path>
                     </svg>
-                    Settings
+                    <span class="nav-text">Settings</span>
                 </a>
             </nav>
 
@@ -112,7 +118,7 @@
                         <polyline points="16 17 21 12 16 7" />
                         <line x1="21" y1="12" x2="9" y2="12" />
                     </svg>
-                    Logout
+                    <span class="nav-text">Logout</span>
                 </a>
             </div>
         </aside>
@@ -151,10 +157,6 @@
                     <div class="user-profile" id="user-menu-trigger">
                         <div class="avatar">JD</div>
                         <span class="user-name">John Doe</span>
-                        <svg class="dropdown-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none"
-                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="m6 9 6 6 6-6" />
-                        </svg>
 
                         <!-- User Dropdown Menu -->
                         <div class="user-dropdown" id="user-dropdown">
@@ -172,166 +174,26 @@
                 </div>
             </header>
 
-            <div class="dashboard-content">
+            <div class="dashboard-content" id="view-container">
+                <!-- Loader Overlay -->
+                <div id="view-loader" class="view-loader">
+                    <div class="spinner"></div>
+                    <p>Loading view...</p>
+                </div>
+
                 <!-- Welcome Greeting Area -->
                 <header class="greeting-area">
                     <h2 id="greeting-text">Good Afternoon, John!</h2>
                     <p id="current-date-text">Sunday, March 8, 2026</p>
                 </header>
 
-                <div id="view-dashboard" class="content-view active">
-                    <!-- Stats Row -->
-                    <div class="stats-grid">
-                        <div class="stat-card">
-                            <span class="stat-title">Total Inventory Items</span>
-                            <span class="stat-value" id="stat-total">0</span>
-                        </div>
-                        <div class="stat-card">
-                            <span class="stat-title">Items Low in Stock</span>
-                            <span class="stat-value" style="color: #eab308;" id="stat-low">0</span>
-                        </div>
-                        <div class="stat-card">
-                            <span class="stat-title">Total Value</span>
-                            <span class="stat-value" style="color: #10b981;" id="stat-value">$0.00</span>
-                        </div>
-                    </div>
-
-                    <!-- Analytics Grid -->
-                    <div class="content-grid">
-                        <!-- Inventory by Category (Pie Chart) -->
-                        <div class="content-card">
-                            <div class="card-header">Inventory by Category</div>
-                            <div class="chart-container">
-                                <canvas id="categoryChart"></canvas>
-                            </div>
-                        </div>
-
-                        <!-- Most Issued Items (Bar Chart) -->
-                        <div class="content-card">
-                            <div class="card-header">Most Issued Items</div>
-                            <div class="chart-container">
-                                <canvas id="issuedChart"></canvas>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Items Management View -->
-                <div id="view-items" class="content-view">
-                    <div class="content-grid">
-                        <!-- Add Item Form inside a Card -->
-                        <div class="content-card">
-                            <div class="card-header">Add New Item</div>
-
-                            <form class="auth-form" id="add-item-form">
-                                <div class="input-group">
-                                    <label for="itemName">Item Name</label>
-                                    <input type="text" id="itemName" placeholder="E.g. Steel Pipe 2in" required>
-                                </div>
-                                <div class="input-group">
-                                    <label for="itemCategory">Category</label>
-                                    <select id="itemCategory" required>
-                                        <option value="General">General</option>
-                                        <option value="Electronics">Electronics</option>
-                                        <option value="Mechanical">Mechanical</option>
-                                        <option value="Raw Materials">Raw Materials</option>
-                                        <option value="Tools">Tools</option>
-                                    </select>
-                                </div>
-                                <div class="input-group">
-                                    <label for="itemQuantity">Quantity in Stock</label>
-                                    <input type="number" id="itemQuantity" placeholder="0" value="0" min="0" required>
-                                </div>
-                                <div class="input-group">
-                                    <label for="itemPrice">Price per Unit ($)</label>
-                                    <input type="number" step="0.01" id="itemPrice" placeholder="0.00" value="0.00"
-                                        min="0" required>
-                                </div>
-                                <button type="button" id="addItemBtn" class="submit-btn" onclick="handleAddItem()">Add
-                                    to Inventory</button>
-                            </form>
-                        </div>
-
-                        <!-- Inventory Table inside a Card -->
-                        <div class="content-card">
-                            <div class="card-header">Current Inventory List</div>
-
-                            <div class="table-container">
-                                <table class="data-table">
-                                    <thead>
-                                        <tr>
-                                            <th>ID</th>
-                                            <th>Item Name</th>
-                                            <th>Category</th>
-                                            <th>Quantity</th>
-                                            <th>Price ($)</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="inventoryList">
-                                        <!-- Populated dynamically by JS -->
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div id="view-activity" class="content-view">
-                    <div class="content-card">
-                        <div class="card-header">Stock Activity</div>
-                        <p class="placeholder-text">Stock activity timeline coming soon...</p>
-                    </div>
-                </div>
-                <div id="view-summary" class="content-view">
-                    <div class="content-card">
-                        <div class="card-header">Stock Summary</div>
-                        <p class="placeholder-text">Inventory summaries and analytics coming soon...</p>
-                    </div>
-                </div>
-                <div id="view-reports" class="content-view">
-                    <div class="content-card">
-                        <div class="card-header">Weekly Reports</div>
-                        <p class="placeholder-text">Automated weekly reports and exports coming soon...</p>
-                    </div>
-                </div>
-
-                <!-- Settings View -->
-                <div id="view-settings" class="content-view">
-                    <div class="settings-grid">
-                        <div class="content-card">
-                            <div class="card-header">Profile Management</div>
-                            <form class="auth-form">
-                                <div class="input-group">
-                                    <label>Display Name</label>
-                                    <input type="text" value="John Doe">
-                                </div>
-                                <div class="input-group">
-                                    <label>Email Address</label>
-                                    <input type="email" value="john.doe@example.com">
-                                </div>
-                                <button type="button" class="submit-btn">Update Profile</button>
-                            </form>
-                        </div>
-                        <div class="content-card">
-                            <div class="card-header">Security</div>
-                            <form class="auth-form">
-                                <div class="input-group">
-                                    <label>Current Password</label>
-                                    <input type="password" placeholder="••••••••">
-                                </div>
-                                <div class="input-group">
-                                    <label>New Password</label>
-                                    <input type="password" placeholder="••••••••">
-                                </div>
-                                <button type="button" class="submit-btn bg-error">Change Password</button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
+                <!-- Dynamic Content Replaces Here -->
+                <div id="dynamic-content"></div>
             </div>
         </main>
     </div>
 
-    <script src="./renderer.js"></script>
+    <script src="../renderer.js"></script>
 </body>
 
 </html>

@@ -1,0 +1,26 @@
+<!-- Stats Row -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <span class="stat-title">Total Inventory Items</span>
+        <span class="stat-value" id="stat-total">0</span>
+    </div>
+    <div class="stat-card">
+        <span class="stat-title">Items Low in Stock</span>
+        <span class="stat-value" style="color: #eab308;" id="stat-low">0</span>
+    </div>
+    <div class="stat-card">
+        <span class="stat-title">Total Value</span>
+        <span class="stat-value" style="color: #10b981;" id="stat-value">$0.00</span>
+    </div>
+</div>
+
+<!-- Content Grid (Analytics) -->
+<div class="content-grid">
+    <!-- Inventory by Category (Pie Chart) -->
+    <div class="content-card" style="grid-column: 1 / -1;">
+        <div class="card-header">Available Stock by Category</div>
+        <div class="chart-container" style="height: 480px;">
+            <canvas id="categoryChart"></canvas>
+        </div>
+    </div>
+</div>

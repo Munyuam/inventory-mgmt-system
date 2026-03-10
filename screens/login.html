@@ -5,8 +5,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Login - Inventory Management System</title>
-  <link rel="stylesheet" href="./login-styles.css">
-  <link rel="stylesheet" href="./splash-styles.css">
+  <link rel="stylesheet" href="../public/styles/login-styles.css">
+  <link rel="stylesheet" href="../public/styles/splash-styles.css">
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600&display=swap" rel="stylesheet">
   <!-- Content Security Policy: updated to allow inline scripts and Clerk CDN if uncommented -->
   <meta http-equiv="Content-Security-Policy"
@@ -28,7 +28,7 @@
     <!-- LEFT SIDE: Image Panel -->
     <div class="image-panel">
       <!-- Structural image element (managed via CSS object-fit) -->
-      <img src="./images/man-inventory.jpg" alt="inventory background" class="panel-bg-img">
+      <img src="../public/images/man-inventory.jpg" alt="inventory background" class="panel-bg-img">
 
       <div class="image-overlay">
         <h2>Efficient. Seamless. Robust.</h2>
@@ -59,7 +59,6 @@
       </button>
 
       <div class="form-wrapper" id="custom-ui">
-
         <div class="app-brand">
           <h1>Inventory System</h1>
           <p class="subtitle">Secure access portal</p>
@@ -69,6 +68,9 @@
           <button class="tab-btn active" id="btn-login" type="button">Log In</button>
           <button class="tab-btn" id="btn-signup" type="button">Sign Up</button>
         </div>
+
+        <!-- Feedback Area -->
+        <div id="auth-feedback" class="auth-feedback" style="display: none;"></div>
 
         <form id="auth-form" class="auth-form">
           <div class="input-group" id="username-group">
@@ -84,7 +86,11 @@
           </div>
 
           <div class="input-group">
-            <label for="password">Password</label>
+            <div class="label-row">
+              <label for="password">Password</label>
+              <a href="https://example.com/reset-password" class="forgot-link" id="forgot-link" target="_blank">Forgot
+                Password?</a>
+            </div>
             <input type="password" id="password" placeholder="••••••••" required>
           </div>
 
@@ -105,7 +111,7 @@
 
   </div>
 
-  <script src="./login.js"></script>
+  <script src="../public/scripts/login.js"></script>
 </body>
 
 </html>

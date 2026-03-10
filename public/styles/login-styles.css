@@ -219,7 +219,26 @@ body.fade-out {
   font-size: 0.875rem;
   font-weight: 500;
   color: var(--text-main);
+}
+
+.label-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   margin-bottom: 8px;
+}
+
+.forgot-link {
+  font-size: 0.8125rem;
+  color: var(--primary-color);
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.forgot-link:hover {
+  color: var(--primary-hover);
+  text-decoration: underline;
 }
 
 .input-group input {
@@ -242,6 +261,38 @@ body.fade-out {
 .input-group input::placeholder {
   color: var(--text-muted);
   opacity: 0.7;
+}
+
+.auth-feedback {
+  margin-bottom: 20px;
+  padding: 12px;
+  border-radius: 2px;
+  font-size: 0.9rem;
+  text-align: center;
+  animation: fadeIn 0.3s ease-out;
+  font-weight: 500;
+}
+
+.auth-feedback.error {
+  background-color: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+}
+
+.auth-feedback.success {
+  background-color: rgba(16, 185, 129, 0.1);
+  color: #10b981;
+}
+
+.auth-feedback.info {
+  background-color: rgba(37, 99, 235, 0.15);
+  color: #2563eb;
+  border: 1px solid rgba(37, 99, 235, 0.3);
+}
+
+.auth-feedback.warning {
+  background-color: rgba(245, 158, 11, 0.15);
+  color: #f59e0b;
+  border: 1px solid rgba(245, 158, 11, 0.3);
 }
 
 .help-text {

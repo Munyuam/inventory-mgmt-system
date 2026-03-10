@@ -1,17 +1,17 @@
 const { app, BrowserWindow, ipcMain } = require('electron')
 const path = require('node:path')
-const db = require('./database.js')
+const db = require('../database.js')
 
 const createWindow = () => {
     const win = new BrowserWindow({
         width: 1000,
         height: 800,
         webPreferences: {
-            preload: path.join(__dirname, 'preload.js')
+            preload: path.join(__dirname, '../preload.js')
         }
     })
 
-    win.loadFile('login.html')
+    win.loadFile(path.join(__dirname, '../screens/login.html'))
 }
 
 app.whenReady().then(() => {
@@ -22,6 +22,14 @@ app.whenReady().then(() => {
 
     ipcMain.handle('get-items', () => {
         return db.getItems(userDataPath);
+    });
+
+    ipcMain.handle('auth-signup', async (event, { username, email, password }) => {
+        return await db.registerUser(userDataPath, username, email, password);
+    });
+
+    ipcMain.handle('auth-login', async (event, { username, password }) => {
+        return await db.authenticateUser(userDataPath, username, password);
     });
 
     ipcMain.handle('add-item', (event, item) => {

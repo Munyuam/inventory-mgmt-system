@@ -50,12 +50,19 @@ const loadItems = async () => {
 };
 
 const updateCharts = (categoryData, mostIssuedItems) => {
+    // TEMPORARY: Use descriptive dummy data as requested
+    categoryData = {
+        'Electronics & Gadgets': 35,
+        'Office Furniture': 25,
+        'Stationery Supplies': 20,
+        'Maintenance Tools': 15,
+        'Employee Gear': 5
+    };
+
     const ctxCategory = document.getElementById('categoryChart');
-    const ctxIssued = document.getElementById('issuedChart');
+    if (!ctxCategory) return;
 
-    if (!ctxCategory || !ctxIssued) return;
-
-    // --- Category Pie Chart ---
+    // --- High-Detail Category Pie Chart ---
     if (categoryChart) categoryChart.destroy();
     categoryChart = new Chart(ctxCategory, {
         type: 'pie',
@@ -64,9 +71,15 @@ const updateCharts = (categoryData, mostIssuedItems) => {
             datasets: [{
                 data: Object.values(categoryData),
                 backgroundColor: [
-                    '#2563eb', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'
+                    '#2563eb', // Blue
+                    '#10b981', // Green
+                    '#f59e0b', // Amber
+                    '#ef4444', // Red
+                    '#8b5cf6'  // Violet
                 ],
-                borderWidth: 0
+                hoverOffset: 20,
+                borderWidth: 2,
+                borderColor: getComputedStyle(document.documentElement).getPropertyValue('--bg-card')
             }]
         },
         options: {
@@ -74,64 +87,25 @@ const updateCharts = (categoryData, mostIssuedItems) => {
             maintainAspectRatio: false,
             plugins: {
                 tooltip: {
+                    padding: 12,
+                    bodyFont: { size: 14 },
                     callbacks: {
-                        label: (item) => ` ${item.label}: ${item.raw} units`
+                        label: (item) => ` ${item.label}: ${item.raw} units (${((item.raw / 100) * 100).toFixed(1)}%)`
                     }
                 },
                 legend: {
-                    position: 'bottom',
+                    position: 'right',
                     labels: {
                         color: getComputedStyle(document.documentElement).getPropertyValue('--text-main'),
-                        padding: 20,
-                        usePointStyle: true
-                    }
-                }
-            }
-        }
-    });
-
-    // --- Most Issued Bar Chart ---
-    const issuedLabels = mostIssuedItems.map(item => item.name);
-    const issuedValues = mostIssuedItems.map(item => item.issued_count);
-
-    if (issuedChart) issuedChart.destroy();
-    issuedChart = new Chart(ctxIssued, {
-        type: 'bar',
-        data: {
-            labels: issuedLabels,
-            datasets: [{
-                label: 'Total Units Issued',
-                data: issuedValues,
-                backgroundColor: '#10b981',
-                borderRadius: 8,
-                barThickness: 30
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            indexAxis: 'y', // Horizontal orientation for better readability
-            plugins: {
-                legend: { display: false },
-                tooltip: {
-                    callbacks: {
-                        label: (item) => ` ${item.raw} units issued`
+                        font: { size: 14, weight: '500' },
+                        padding: 25,
+                        usePointStyle: true,
+                        pointStyle: 'circle'
                     }
                 }
             },
-            scales: {
-                x: {
-                    beginAtZero: true,
-                    grid: { color: 'rgba(0,0,0,0.05)' },
-                    ticks: { color: getComputedStyle(document.documentElement).getPropertyValue('--text-muted') }
-                },
-                y: {
-                    grid: { display: false },
-                    ticks: {
-                        color: getComputedStyle(document.documentElement).getPropertyValue('--text-main'),
-                        font: { weight: '600' }
-                    }
-                }
+            layout: {
+                padding: 20
             }
         }
     });
@@ -213,14 +187,48 @@ const updateGreeting = () => {
     dateElement.textContent = new Date().toLocaleDateString(undefined, options);
 };
 
-// --- Navigation Logic ---
+// --- Navigation Logic (Dynamic Loading) ---
+const loadView = async (viewName) => {
+    const loader = document.getElementById('view-loader');
+    const container = document.getElementById('dynamic-content');
+    if (!loader || !container) return;
+
+    // Show loader
+    loader.classList.add('active');
+    container.style.opacity = '0.5';
+
+    try {
+        const response = await fetch(`../services/${viewName}.html`);
+        if (!response.ok) throw new Error(`Failed to load view: ${viewName}`);
+
+        const html = await response.text();
+
+        // Brief delay to make the transition feel smoother and show the loader
+        await new Promise(r => setTimeout(r, 600));
+
+        container.innerHTML = html;
+        container.style.opacity = '1';
+
+        // Re-initialize view-specific logic
+        if (viewName === 'dashboard') {
+            await loadItems(); // Re-renders charts
+        } else if (viewName === 'items') {
+            await loadItems(); // Fills the table
+        }
+    } catch (error) {
+        console.error('Error loading view:', error);
+        container.innerHTML = `<div class="error-msg">Failed to load content. Please try again.</div>`;
+    } finally {
+        loader.classList.remove('active');
+    }
+};
+
 const setupNavigation = () => {
-    const navItems = document.querySelectorAll('.nav-item');
-    const views = document.querySelectorAll('.content-view');
+    const navItems = document.querySelectorAll('.nav-item:not(.logout-link)');
     const pageTitle = document.querySelector('.page-title');
 
     navItems.forEach(item => {
-        item.addEventListener('click', (e) => {
+        item.addEventListener('click', async (e) => {
             e.preventDefault();
             const viewId = item.getAttribute('data-view');
             if (!viewId) return;
@@ -229,17 +237,15 @@ const setupNavigation = () => {
             navItems.forEach(i => i.classList.remove('active'));
             item.classList.add('active');
 
-            // Switch Views
-            views.forEach(v => v.classList.remove('active'));
-            const targetView = document.getElementById(`view-${viewId}`);
-            if (targetView) targetView.classList.add('active');
-
             // Update Page Title
-            if (pageTitle) {
-                pageTitle.textContent = item.textContent.trim();
-            }
+            if (pageTitle) pageTitle.textContent = item.textContent.trim();
+
+            await loadView(viewId);
         });
     });
+
+    // Load initial view
+    loadView('dashboard');
 };
 
 // --- User Menu Dropdown ---
@@ -269,11 +275,33 @@ const setupUserMenu = () => {
     if (sidebarLogoutBtn) sidebarLogoutBtn.addEventListener('click', handleLogout);
 };
 
+// --- Collapsible Sidebar Logic ---
+const setupSidebar = () => {
+    const sidebar = document.getElementById('sidebar');
+    const toggleBtn = document.getElementById('sidebar-toggle');
+    const mainContent = document.querySelector('.main-content');
+
+    if (!sidebar || !toggleBtn) return;
+
+    // Load saved state
+    const isCollapsed = localStorage.getItem('sidebar-collapsed') === 'true';
+    if (isCollapsed) {
+        sidebar.classList.add('collapsed');
+    }
+
+    toggleBtn.addEventListener('click', () => {
+        sidebar.classList.toggle('collapsed');
+        const state = sidebar.classList.contains('collapsed');
+        localStorage.setItem('sidebar-collapsed', state);
+    });
+};
+
 window.handleAddItem = handleAddItem;
 
 // Initialization
 document.addEventListener('DOMContentLoaded', () => {
     setupTheme();
+    setupSidebar();
     loadItems();
     updateGreeting();
     setupNavigation();

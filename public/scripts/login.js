@@ -10,8 +10,21 @@ document.addEventListener('DOMContentLoaded', () => {
   const themeToggle = document.getElementById('theme-toggle');
   const iconSun = document.getElementById('icon-sun');
   const iconMoon = document.getElementById('icon-moon');
+  const forgotLink = document.getElementById('forgot-link');
+  const authFeedback = document.getElementById('auth-feedback');
 
   let mode = 'login'; // 'login' or 'signup'
+
+  // --- Helpers ---
+  const showFeedback = (message, type = 'info') => {
+    authFeedback.textContent = message;
+    authFeedback.className = `auth-feedback ${type}`;
+    authFeedback.style.display = 'block';
+  };
+
+  const hideFeedback = () => {
+    authFeedback.style.display = 'none';
+  };
 
   // --- Theming Logic ---
   const applyThemeIcons = (theme) => {
@@ -46,6 +59,7 @@ document.addEventListener('DOMContentLoaded', () => {
       // In login, we only need username & password
       emailGroup.style.display = 'none';
       emailInput.required = false;
+      forgotLink.style.display = 'block';
     } else {
       btnSignup.classList.add('active');
       btnLogin.classList.remove('active');
@@ -53,6 +67,7 @@ document.addEventListener('DOMContentLoaded', () => {
       // In signup, we need username, email, & password
       emailGroup.style.display = 'flex';
       emailInput.required = true;
+      forgotLink.style.display = 'none';
     }
   };
 
@@ -66,27 +81,56 @@ document.addEventListener('DOMContentLoaded', () => {
     updateUI();
   });
 
-  authForm.addEventListener('submit', (e) => {
+  authForm.addEventListener('submit', async (e) => {
     e.preventDefault();
-    const username = document.getElementById('username').value;
-    const password = document.getElementById('password').value;
-    const email = document.getElementById('email').value; // Only used in signup
+    hideFeedback();
 
-    submitBtn.textContent = 'Authenticating...';
+    const username = usernameInput.value.trim();
+    const password = document.getElementById('password').value;
+    const email = emailInput.value.trim();
+
+    if (!username || !password) {
+      showFeedback('Username and password are required', 'error');
+      return;
+    }
+
+    submitBtn.textContent = 'Please wait...';
     submitBtn.disabled = true;
 
-    // Start the transition by fading out
-    document.body.classList.add('fade-out');
-
-    // Wait for the transition to complete (500ms matching CSS, let's use 600ms for safety)
-    setTimeout(() => {
-      console.log(`Action: ${mode === 'login' ? 'Logging in' : 'Signing up'}\nUsername: ${username}`);
+    try {
       if (mode === 'signup') {
-        console.log(`Email provided: ${email}`);
+        const result = await window.api.signup({ username, email, password });
+        if (result.success) {
+          showFeedback('Account created! You can now log in.', 'success');
+          mode = 'login';
+          updateUI();
+          // Clear inputs
+          usernameInput.value = '';
+          emailInput.value = '';
+          document.getElementById('password').value = '';
+        } else {
+          showFeedback(result.error || 'Signup failed', 'error');
+        }
+      } else {
+        const result = await window.api.login({ username, password });
+        if (result.success) {
+          showFeedback('Login successful! Redirecting...', 'success');
+          document.body.classList.add('fade-out');
+          setTimeout(() => {
+            window.location.href = './dashboard.html';
+          }, 600);
+          return; // Prevent resetting the button
+        } else {
+          showFeedback(result.error || 'Login failed', 'error');
+        }
       }
-
-      // Navigate to the main application interface
-      window.location.href = 'index.html';
-    }, 600);
+    } catch (err) {
+      showFeedback('An unexpected error occurred: ' + err.message, 'error');
+    } finally {
+      if (!document.body.classList.contains('fade-out')) {
+        submitBtn.textContent = (mode === 'login' ? 'Continue' : 'Create Account');
+        submitBtn.disabled = false;
+      }
+    }
   });
 });
