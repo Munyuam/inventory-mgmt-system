@@ -1,17 +1,17 @@
-<!-- Items Management View -->
+<!-- Product Management View -->
 <div class="content-grid">
-    <!-- Add Item Form inside a Card -->
+    <!-- Add Product Form inside a Card -->
     <div class="content-card">
-        <div class="card-header">Add New Item</div>
+        <div class="card-header">Add New Product</div>
 
-        <form class="auth-form" id="add-item-form">
+        <form class="auth-form" id="add-product-form">
             <div class="input-group">
-                <label for="itemName">Item Name</label>
-                <input type="text" id="itemName" placeholder="E.g. Steel Pipe 2in" required>
+                <label for="productName">Product Name</label>
+                <input type="text" id="productName" placeholder="E.g. Steel Pipe 2in" required>
             </div>
             <div class="input-group">
-                <label for="itemCategory">Category</label>
-                <select id="itemCategory" required>
+                <label for="productCategory">Category</label>
+                <select id="productCategory" required>
                     <option value="General">General</option>
                     <option value="Electronics">Electronics</option>
                     <option value="Mechanical">Mechanical</option>
@@ -20,14 +20,16 @@
                 </select>
             </div>
             <div class="input-group">
-                <label for="itemQuantity">Quantity in Stock</label>
-                <input type="number" id="itemQuantity" placeholder="0" value="0" min="0" required>
+                <label for="productQuantity">Quantity in Stock</label>
+                <input type="number" id="productQuantity" placeholder="0" value="0" min="0" required>
             </div>
             <div class="input-group">
-                <label for="itemPrice">Price per Unit ($)</label>
-                <input type="number" step="0.01" id="itemPrice" placeholder="0.00" value="0.00" min="0" required>
+                <label for="productPrice">Price per Unit (MK)</label>
+                <input type="number" step="0.01" id="productPrice" placeholder="0.00" value="0.00" min="0" required>
             </div>
-            <button type="button" id="addItemBtn" class="submit-btn" onclick="handleAddItem()">Add to Inventory</button>
+            <button type="button" id="addProductBtn" class="submit-btn" onclick="handleAddProduct()">Add to
+                Inventory</button>
+            <div id="product-feedback" class="auth-feedback" style="display: none; margin-top: 1rem;"></div>
         </form>
     </div>
 
@@ -40,10 +42,10 @@
                 <thead>
                     <tr>
                         <th>ID</th>
-                        <th>Item Name</th>
+                        <th>Product Name</th>
                         <th>Category</th>
                         <th>Quantity</th>
-                        <th>Price ($)</th>
+                        <th>Price (MK)</th>
                     </tr>
                 </thead>
                 <tbody id="inventoryList">

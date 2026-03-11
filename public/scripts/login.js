@@ -101,13 +101,12 @@ document.addEventListener('DOMContentLoaded', () => {
       if (mode === 'signup') {
         const result = await window.api.signup({ username, email, password });
         if (result.success) {
-          showFeedback('Account created! You can now log in.', 'success');
-          mode = 'login';
-          updateUI();
-          // Clear inputs
-          usernameInput.value = '';
-          emailInput.value = '';
-          document.getElementById('password').value = '';
+          showFeedback('Account created! Logging you in...', 'success');
+          document.body.classList.add('fade-out');
+          setTimeout(() => {
+            window.location.href = './dashboard.html';
+          }, 600);
+          return;
         } else {
           showFeedback(result.error || 'Signup failed', 'error');
         }

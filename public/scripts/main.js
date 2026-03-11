@@ -20,8 +20,8 @@ app.whenReady().then(() => {
     // Initialize DB early so it is ready
     db.initDb(userDataPath);
 
-    ipcMain.handle('get-items', () => {
-        return db.getItems(userDataPath);
+    ipcMain.handle('get-products', () => {
+        return db.getProducts(userDataPath);
     });
 
     ipcMain.handle('auth-signup', async (event, { username, email, password }) => {
@@ -32,8 +32,8 @@ app.whenReady().then(() => {
         return await db.authenticateUser(userDataPath, username, password);
     });
 
-    ipcMain.handle('add-item', (event, item) => {
-        return db.addItem(userDataPath, item.name, item.quantity, item.price);
+    ipcMain.handle('add-product', (event, item) => {
+        return db.addProduct(userDataPath, item.name, item.quantity, item.price);
     });
 
     createWindow()

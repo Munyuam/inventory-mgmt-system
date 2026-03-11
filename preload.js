@@ -1,8 +1,10 @@
 const { contextBridge, ipcRenderer } = require('electron')
 
 contextBridge.exposeInMainWorld('api', {
-    getItems: () => ipcRenderer.invoke('get-items'),
-    addItem: (item) => ipcRenderer.invoke('add-item', item),
-    login: ({ username, password }) => ipcRenderer.invoke('auth-login', { username, password }),
-    signup: ({ username, email, password }) => ipcRenderer.invoke('auth-signup', { username, email, password }),
+    getProducts: () => ipcRenderer.invoke('get-products'),
+    addProduct: (product) => ipcRenderer.invoke('add-product', product),
+    login: (credentials) => ipcRenderer.invoke('auth-login', credentials),
+    signup: (userData) => ipcRenderer.invoke('auth-signup', userData),
+    getCurrentUser: () => ipcRenderer.invoke('get-current-user'),
+    logout: () => ipcRenderer.invoke('logout'),
 })

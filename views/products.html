@@ -1,0 +1,953 @@
+<!-- Products View — HTML only. All JS is in renderer.js (initProductsView) -->
+
+<!-- DataTables CSS loaded once here -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.8/css/dataTables.simple.min.css">
+
+<style>
+    /* ---------- Layout ---------- */
+    .pv-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 24px;
+    }
+
+    .pv-header-text h3 {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: var(--text-main);
+        margin: 0;
+    }
+
+    .pv-header-text p {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        margin: 3px 0 0;
+    }
+
+    .btn-add-product {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        padding: 10px 20px;
+        background: var(--primary, #3b82f6);
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+
+    .btn-add-product:hover {
+        background: hsl(222, 70%, 44%);
+    }
+
+    .btn-add-product svg {
+        width: 15px;
+        height: 15px;
+    }
+
+    .btn-issue-product {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        padding: 10px 20px;
+        background: transparent;
+        color: #d97706;
+        border: 1.5px solid #fcd34d;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.2s, color 0.2s;
+    }
+
+    .btn-issue-product:hover {
+        background: rgba(245, 158, 11, 0.08);
+        border-color: #f59e0b;
+    }
+
+    .btn-issue-product svg {
+        width: 15px;
+        height: 15px;
+    }
+
+    .pv-header-actions {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+    }
+
+    .pv-header-actions {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+    }
+
+    /* ---- Issue modal orange theme ---- */
+    .modal-box.issue-theme {
+        border-top-color: #f59e0b;
+    }
+
+    .issue-step-dot.done {
+        background: #f59e0b;
+    }
+
+    .issue-step-dot.active {
+        background: #fcd34d;
+    }
+
+    .issue-step-dot {
+        flex: 1;
+        height: 3px;
+        border-radius: 2px;
+        background: var(--border-subtle, #e5e7eb);
+        transition: background 0.3s;
+    }
+
+    .mbtn-issue {
+        background: #f59e0b;
+        color: #fff;
+        padding: 9px 20px;
+        border-radius: 7px;
+        font-size: 0.875rem;
+        font-weight: 600;
+        cursor: pointer;
+        border: none;
+        transition: background 0.15s;
+    }
+
+    .mbtn-issue:hover {
+        background: #d97706;
+    }
+
+    .issue-product-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 12px;
+        border: 1px solid var(--border-subtle, #e5e7eb);
+        border-radius: 8px;
+        margin-bottom: 8px;
+        cursor: pointer;
+        transition: border-color 0.15s, background 0.15s;
+    }
+
+    .issue-product-row:hover,
+    .issue-product-row.selected {
+        border-color: #f59e0b;
+        background: rgba(245, 158, 11, 0.05);
+    }
+
+    .issue-product-row input[type="radio"] {
+        accent-color: #f59e0b;
+    }
+
+    .issue-product-row .ipr-name {
+        flex: 1;
+        font-weight: 600;
+        font-size: 0.9rem;
+        color: var(--text-main);
+    }
+
+    .issue-product-row .ipr-meta {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+    }
+
+    .issue-product-list {
+        max-height: 220px;
+        overflow-y: auto;
+        margin-bottom: 4px;
+    }
+
+    .issue-empty {
+        text-align: center;
+        color: var(--text-muted);
+        font-size: 0.85rem;
+        padding: 20px 0;
+    }
+
+    /* ---------- Table wrap ---------- */
+    #products-table-wrap {
+        background: var(--bg-card, #fff);
+        border: 1px solid var(--border-subtle, #e5e7eb);
+        border-radius: 10px;
+        padding: 0 0 8px;
+        overflow: hidden;
+    }
+
+    /* DataTables controls toolbar */
+    #products-table-wrap .dataTables_wrapper {
+        font-size: 0.875rem;
+        color: var(--text-muted);
+    }
+
+    #products-table-wrap .dataTables_filter,
+    #products-table-wrap .dataTables_length {
+        padding: 14px 20px 0;
+    }
+
+    #products-table-wrap .dataTables_info,
+    #products-table-wrap .dataTables_paginate {
+        padding: 10px 20px;
+    }
+
+    #products-table-wrap .dataTables_filter input,
+    #products-table-wrap .dataTables_length select {
+        border: 1px solid var(--border-subtle, #e5e7eb);
+        border-radius: 6px;
+        padding: 5px 10px;
+        background: var(--bg-app, #f9fafb);
+        color: var(--text-main);
+        font-size: 0.85rem;
+        margin-left: 6px;
+    }
+
+    #products-table-wrap .dataTables_filter input:focus,
+    #products-table-wrap .dataTables_length select:focus {
+        outline: none;
+        border-color: var(--primary, #3b82f6);
+    }
+
+    #products-table-wrap .paginate_button {
+        border-radius: 5px !important;
+        padding: 3px 9px !important;
+        font-size: 0.82rem !important;
+        cursor: pointer;
+    }
+
+    #products-table-wrap .paginate_button.current {
+        background: var(--primary, #3b82f6) !important;
+        border-color: var(--primary, #3b82f6) !important;
+        color: #fff !important;
+    }
+
+    /* thead */
+    #products-table-wrap table.dataTable thead th {
+        font-size: 0.72rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.07em;
+        color: var(--text-muted, #6b7280);
+        border-bottom: 2px solid var(--border-subtle, #e5e7eb);
+        padding: 12px 20px;
+        background: transparent;
+        white-space: nowrap;
+    }
+
+    #products-table-wrap table.dataTable thead th:first-child {
+        padding-left: 24px;
+        color: var(--primary, #3b82f6);
+    }
+
+    /* tbody */
+    #products-table-wrap table.dataTable tbody td {
+        padding: 12px 20px;
+        border-bottom: 1px solid var(--border-subtle, #e5e7eb);
+        color: var(--text-main);
+        vertical-align: middle;
+        font-size: 0.9rem;
+    }
+
+    #products-table-wrap table.dataTable tbody td:first-child {
+        padding-left: 24px;
+        color: var(--text-muted);
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+
+    #products-table-wrap table.dataTable tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+    #products-table-wrap table.dataTable tbody tr:nth-child(even) td {
+        background: hsla(222, 30%, 50%, 0.025);
+    }
+
+    #products-table-wrap table.dataTable tbody tr:hover td {
+        background: hsla(222, 70%, 50%, 0.05);
+        border-left: 3px solid var(--primary, #3b82f6);
+        padding-left: 21px;
+        /* compensate for border */
+    }
+
+    #products-table-wrap table.dataTable tbody tr:hover td:first-child {
+        padding-left: 21px;
+    }
+
+    /* No-border DataTables wrapper fix */
+    #products-table-wrap table.dataTable {
+        border-collapse: collapse !important;
+    }
+
+    /* Badges */
+    .badge {
+        display: inline-block;
+        padding: 3px 9px;
+        border-radius: 20px;
+        font-size: 0.7rem;
+        font-weight: 700;
+        letter-spacing: 0.03em;
+    }
+
+    .badge-ok {
+        background: rgba(16, 185, 129, 0.1);
+        color: #059669;
+    }
+
+    .badge-low {
+        background: rgba(245, 158, 11, 0.1);
+        color: #b45309;
+    }
+
+    /* Dark mode */
+    [data-theme='dark'] #products-table-wrap {
+        background: var(--bg-card);
+    }
+
+    [data-theme='dark'] #products-table-wrap .dataTables_filter input,
+    [data-theme='dark'] #products-table-wrap .dataTables_length select {
+        background: var(--bg-surface);
+        color: var(--text-main);
+    }
+
+    [data-theme='dark'] #products-table-wrap table.dataTable tbody tr:nth-child(even) td {
+        background: hsla(222, 30%, 50%, 0.04);
+    }
+
+    /* ---------- Modals ---------- */
+    .modal-backdrop {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.45);
+        z-index: 4000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.2s;
+    }
+
+    .modal-backdrop.open {
+        opacity: 1;
+        pointer-events: all;
+    }
+
+    .modal-box {
+        background: var(--bg-card, #fff);
+        border-radius: 14px;
+        width: min(520px, calc(100vw - 40px));
+        padding: 32px 36px 28px;
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+        position: relative;
+        transform: translateY(12px);
+        transition: transform 0.25s ease;
+        border-top: 3px solid var(--primary, #3b82f6);
+    }
+
+    .modal-backdrop.open .modal-box {
+        transform: translateY(0);
+    }
+
+    /* Stepper dots */
+    .modal-stepper {
+        display: flex;
+        gap: 6px;
+        margin-bottom: 24px;
+    }
+
+    .step-dot {
+        flex: 1;
+        height: 3px;
+        border-radius: 2px;
+        background: var(--border-subtle, #e5e7eb);
+        transition: background 0.3s;
+    }
+
+    .step-dot.done {
+        background: var(--primary, #3b82f6);
+    }
+
+    .step-dot.active {
+        background: hsl(222, 70%, 70%);
+    }
+
+    .modal-title {
+        font-size: 1.15rem;
+        font-weight: 700;
+        color: var(--text-main);
+        margin-bottom: 2px;
+    }
+
+    .modal-subtitle {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        margin-bottom: 24px;
+    }
+
+    /* Fields */
+    .mf {
+        margin-bottom: 16px;
+    }
+
+    .mf label {
+        display: block;
+        font-size: 0.78rem;
+        font-weight: 600;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        margin-bottom: 5px;
+    }
+
+    .mf input,
+    .mf select,
+    .mf textarea {
+        width: 100%;
+        box-sizing: border-box;
+        padding: 9px 12px;
+        border: 1px solid var(--border-subtle, #d1d5db);
+        border-radius: 7px;
+        font-size: 0.9rem;
+        color: var(--text-main);
+        background: var(--bg-app, #f9fafb);
+        font-family: inherit;
+        transition: border-color 0.15s;
+    }
+
+    .mf input:focus,
+    .mf select:focus,
+    .mf textarea:focus {
+        outline: none;
+        border-color: var(--primary, #3b82f6);
+    }
+
+    .mf textarea {
+        min-height: 72px;
+        resize: vertical;
+    }
+
+    .mf.mf-err input,
+    .mf.mf-err select {
+        border-color: #ef4444;
+    }
+
+    .mrow {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+    }
+
+    /* Buttons */
+    .modal-footer {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        margin-top: 24px;
+    }
+
+    .mbtn {
+        padding: 9px 20px;
+        border-radius: 7px;
+        font-size: 0.875rem;
+        font-weight: 600;
+        cursor: pointer;
+        border: none;
+        transition: background 0.15s;
+    }
+
+    .mbtn-ghost {
+        background: var(--border-subtle, #e5e7eb);
+        color: var(--text-muted);
+    }
+
+    .mbtn-ghost:hover {
+        background: #d1d5db;
+    }
+
+    .mbtn-primary {
+        background: var(--primary, #3b82f6);
+        color: #fff;
+    }
+
+    .mbtn-primary:hover {
+        background: hsl(222, 70%, 44%);
+    }
+
+    .mbtn-success {
+        background: #10b981;
+        color: #fff;
+    }
+
+    .mbtn-success:hover {
+        background: #059669;
+    }
+
+    .mbtn-remove {
+        background: transparent;
+        color: #ef4444;
+        border: 1px solid #fca5a5;
+        padding: 4px 10px;
+        font-size: 0.78rem;
+        cursor: pointer;
+        border-radius: 5px;
+    }
+
+    .mbtn-remove:hover {
+        background: rgba(239, 68, 68, 0.07);
+    }
+
+    /* Summary tags */
+    .stags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 7px;
+        margin-bottom: 18px;
+    }
+
+    .stag {
+        padding: 4px 11px;
+        border-radius: 20px;
+        font-size: 0.76rem;
+        font-weight: 600;
+    }
+
+    .stag-s {
+        background: rgba(16, 185, 129, 0.1);
+        color: #065f46;
+        border: 1px solid rgba(16, 185, 129, 0.2);
+    }
+
+    .stag-i {
+        background: rgba(59, 130, 246, 0.1);
+        color: #1d4ed8;
+        border: 1px solid rgba(59, 130, 246, 0.2);
+    }
+
+    .stag-n {
+        background: rgba(245, 158, 11, 0.1);
+        color: #92400e;
+        border: 1px solid rgba(245, 158, 11, 0.2);
+    }
+
+    /* Line items list */
+    .li-list {
+        max-height: 190px;
+        overflow-y: auto;
+        margin-bottom: 14px;
+    }
+
+    .li-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 9px 12px;
+        border: 1px solid var(--border-subtle, #e5e7eb);
+        border-radius: 8px;
+        margin-bottom: 8px;
+        background: var(--bg-app, #f9fafb);
+        font-size: 0.875rem;
+    }
+
+    .li-row .li-name {
+        flex: 1;
+        font-weight: 600;
+        color: var(--text-main);
+    }
+
+    .li-row .li-meta {
+        color: var(--text-muted);
+    }
+
+    .li-empty {
+        text-align: center;
+        color: var(--text-muted);
+        font-size: 0.85rem;
+        padding: 16px 0;
+    }
+
+    .li-add-btn {
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 0;
+        color: var(--primary, #3b82f6);
+        font-size: 0.85rem;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        margin-bottom: 12px;
+    }
+
+    .li-add-btn:hover {
+        text-decoration: underline;
+    }
+
+    .li-form {
+        padding: 14px;
+        border: 1px dashed var(--border-subtle, #d1d5db);
+        border-radius: 8px;
+        margin-bottom: 12px;
+        display: none;
+    }
+
+    .li-form.open {
+        display: block;
+    }
+
+    .li-form-btns {
+        display: flex;
+        justify-content: flex-end;
+        gap: 8px;
+        margin-top: 8px;
+    }
+
+    /* Dark mode */
+    [data-theme='dark'] .modal-box {
+        background: var(--bg-card);
+    }
+
+    [data-theme='dark'] .mf input,
+    [data-theme='dark'] .mf select,
+    [data-theme='dark'] .mf textarea {
+        background: var(--bg-surface);
+        color: var(--text-main);
+    }
+
+    [data-theme='dark'] #products-table-wrap {
+        background: var(--bg-card);
+    }
+
+    [data-theme='dark'] #products-table-wrap .dataTables_filter input,
+    [data-theme='dark'] #products-table-wrap .dataTables_length select {
+        background: var(--bg-surface);
+        color: var(--text-main);
+    }
+</style>
+
+<!-- Page header -->
+<div class="pv-header">
+    <div class="pv-header-text">
+        <h3>Product Inventory</h3>
+        <p>Manage your stock, suppliers and procurement records.</p>
+    </div>
+    <div class="pv-header-actions">
+        <button class="btn-add-product" id="open-supplier-btn">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="12" y1="5" x2="12" y2="19" />
+                <line x1="5" y1="12" x2="19" y2="12" />
+            </svg>
+            Add Product
+        </button>
+
+        <button class="btn-issue-product" id="open-issue-btn">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M5 12h14" />
+                <path d="m12 5 7 7-7 7" />
+            </svg>
+            Issue Product
+        </button>
+    </div>
+</div>
+
+<!-- Inventory table -->
+<div id="products-table-wrap">
+    <table id="products-dt" style="width:100%">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Product Name</th>
+                <th>Category</th>
+                <th>Supplier</th>
+                <th>Invoice</th>
+                <th>Qty Available</th>
+                <th>Unit Price (MK)</th>
+            </tr>
+        </thead>
+        <tbody id="products-tbody"></tbody>
+    </table>
+</div>
+
+<!-- Feedback -->
+<div id="product-feedback" class="auth-feedback" style="display:none; margin-top:14px;"></div>
+
+
+<!-- ===================== STEP 1: SUPPLIER ===================== -->
+<div class="modal-backdrop" id="modal-supplier">
+    <div class="modal-box">
+        <div class="modal-stepper">
+            <div class="step-dot active"></div>
+            <div class="step-dot"></div>
+            <div class="step-dot"></div>
+            <div class="step-dot"></div>
+        </div>
+        <div class="modal-title">Step 1 of 4 — Supplier</div>
+        <div class="modal-subtitle">Who is supplying this product?</div>
+
+        <div class="mf" id="mf-sup-name">
+            <label>Supplier Name *</label>
+            <input type="text" id="sup-name" placeholder="e.g. Acme Industrial Ltd" />
+        </div>
+        <div class="mrow">
+            <div class="mf">
+                <label>Phone</label>
+                <input type="tel" id="sup-phone" placeholder="+265 88 123 4567" />
+            </div>
+        </div>
+        <div class="mf">
+            <label>Email</label>
+            <input type="email" id="sup-email" placeholder="supplier@company.co.mw" />
+        </div>
+
+        <div class="modal-footer">
+            <button class="mbtn mbtn-ghost" id="sup-cancel">Cancel</button>
+            <button class="mbtn mbtn-primary" id="sup-next">Next: Invoice →</button>
+        </div>
+    </div>
+</div>
+
+
+<!-- ===================== STEP 2: INVOICE ===================== -->
+<div class="modal-backdrop" id="modal-invoice">
+    <div class="modal-box">
+        <div class="modal-stepper">
+            <div class="step-dot done"></div>
+            <div class="step-dot active"></div>
+            <div class="step-dot"></div>
+            <div class="step-dot"></div>
+        </div>
+        <div class="modal-title">Step 2 of 4 — Invoice</div>
+        <div class="modal-subtitle">Attach a supplier invoice to this procurement.</div>
+        <div class="stags" id="inv-stags"></div>
+
+        <div class="mrow">
+            <div class="mf" id="mf-inv-number">
+                <label>Invoice Number *</label>
+                <input type="text" id="inv-number" placeholder="INV-2026-0047" />
+            </div>
+            <div class="mf" id="mf-inv-date">
+                <label>Invoice Date *</label>
+                <input type="date" id="inv-date" />
+            </div>
+        </div>
+        <div class="mrow">
+            <div class="mf">
+                <label>Payment Options</label>
+                <select id="inv-terms">
+                    <option>Bank</option>
+                    <option>Cash</option>
+                    <option>Airtel Money</option>
+                    <option>Tnm Mpamba</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="modal-footer">
+            <button class="mbtn mbtn-ghost" id="inv-back">← Back</button>
+            <button class="mbtn mbtn-primary" id="inv-next">Next: Add Items →</button>
+        </div>
+    </div>
+</div>
+
+
+<!-- ===================== STEP 3: INVOICE ITEMS ===================== -->
+<div class="modal-backdrop" id="modal-items">
+    <div class="modal-box">
+        <div class="modal-stepper">
+            <div class="step-dot done"></div>
+            <div class="step-dot done"></div>
+            <div class="step-dot active"></div>
+            <div class="step-dot"></div>
+        </div>
+        <div class="modal-title">Step 3 of 4 — Invoice Items</div>
+        <div class="modal-subtitle">List all items on this invoice.</div>
+        <div class="stags" id="items-stags"></div>
+
+        <div class="li-list" id="li-list"></div>
+
+        <button class="li-add-btn" id="li-add-toggle">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10" />
+                <line x1="12" y1="8" x2="12" y2="16" />
+                <line x1="8" y1="12" x2="16" y2="12" />
+            </svg>
+            Add Line Item
+        </button>
+
+        <div class="li-form" id="li-form">
+            <div class="mf" id="mf-li-name">
+                <label>Item Description *</label>
+                <input type="text" id="li-name" placeholder="e.g. Steel Pipe 2in × 6m" />
+            </div>
+            <div class="mrow">
+                <div class="mf">
+                    <label>Quantity *</label>
+                    <input type="number" id="li-qty" min="1" value="1" />
+                </div>
+                <div class="mf">
+                    <label>Unit Price *</label>
+                    <input type="number" id="li-price" min="0" step="0.01" value="0.00" />
+                </div>
+            </div>
+            <div class="mf">
+                <label>Category</label>
+                <select id="li-category">
+                    <option>General</option>
+                    <option>Electronics</option>
+                    <option>Mechanical</option>
+                    <option>Raw Materials</option>
+                    <option>Tools</option>
+                    <option>Stationery</option>
+                    <option>Furniture</option>
+                </select>
+            </div>
+            <div class="li-form-btns">
+                <button class="mbtn mbtn-ghost" id="li-form-cancel"
+                    style="padding:7px 14px; font-size:0.82rem;">Cancel</button>
+                <button class="mbtn mbtn-primary" id="li-form-add" style="padding:7px 16px; font-size:0.82rem;">Add
+                    Item</button>
+            </div>
+        </div>
+
+        <div class="modal-footer">
+            <button class="mbtn mbtn-ghost" id="items-back">← Back</button>
+            <button class="mbtn mbtn-success" id="items-next">Done — Next Step →</button>
+        </div>
+    </div>
+</div>
+
+
+<!-- ===================== STEP 4: PRODUCT DETAILS ===================== -->
+<div class="modal-backdrop" id="modal-product">
+    <div class="modal-box">
+        <div class="modal-stepper">
+            <div class="step-dot done"></div>
+            <div class="step-dot done"></div>
+            <div class="step-dot done"></div>
+            <div class="step-dot active"></div>
+        </div>
+        <div class="modal-title">Step 4 of 4 — Product Details</div>
+        <div class="modal-subtitle">Select an invoice item and confirm its stock details.</div>
+        <div class="stags" id="prod-stags"></div>
+
+        <div class="mf">
+            <label>Product (from Invoice)</label>
+            <select id="prod-select"></select>
+        </div>
+        <div class="mf" id="mf-prod-name">
+            <label>Display Name *</label>
+            <input type="text" id="prod-name" placeholder="How it appears in inventory" />
+        </div>
+        <div class="mrow">
+            <div class="mf">
+                <label>Quantity to Stock</label>
+                <input type="number" id="prod-qty" min="0" value="1" />
+            </div>
+            <div class="mf">
+                <label>Unit Price (MK)</label>
+                <input type="number" id="prod-price" min="0" step="0.01" value="0.00" />
+            </div>
+        </div>
+        <div class="mf">
+            <label>Category</label>
+            <select id="prod-category">
+                <option>General</option>
+                <option>Electronics</option>
+                <option>Mechanical</option>
+                <option>Raw Materials</option>
+                <option>Tools</option>
+                <option>Stationery</option>
+                <option>Furniture</option>
+            </select>
+        </div>
+
+        <div class="modal-footer">
+            <button class="mbtn mbtn-ghost" id="prod-back">← Back</button>
+            <button class="mbtn mbtn-success" id="prod-submit">✓ Add to Inventory</button>
+        </div>
+    </div>
+</div>
+
+
+<!-- ===================== ISSUE PRODUCT — STEP 1: SELECT PRODUCT ===================== -->
+<div class="modal-backdrop" id="modal-issue-select">
+    <div class="modal-box issue-theme">
+        <div class="modal-stepper">
+            <div class="issue-step-dot active"></div>
+            <div class="issue-step-dot"></div>
+        </div>
+        <div class="modal-title">Issue Stock — Step 1 of 2</div>
+        <div class="modal-subtitle">Select the product you want to issue from inventory.</div>
+
+        <div class="mf">
+            <label>Search Products</label>
+            <input type="text" id="issue-search" placeholder="Type to filter…" />
+        </div>
+
+        <div class="issue-product-list" id="issue-product-list">
+            <div class="issue-empty" id="issue-list-empty">No products in inventory yet.</div>
+        </div>
+
+        <div class="modal-footer">
+            <button class="mbtn mbtn-ghost" id="issue-select-cancel">Cancel</button>
+            <button class="mbtn mbtn-issue" id="issue-select-next">Next →</button>
+        </div>
+    </div>
+</div>
+
+
+<!-- ===================== ISSUE PRODUCT — STEP 2: DETAILS ===================== -->
+<div class="modal-backdrop" id="modal-issue-details">
+    <div class="modal-box issue-theme">
+        <div class="modal-stepper">
+            <div class="issue-step-dot done"></div>
+            <div class="issue-step-dot active"></div>
+        </div>
+        <div class="modal-title">Issue Stock — Step 2 of 2</div>
+        <div class="modal-subtitle">Fill in the issuance details.</div>
+        <div class="stags" id="issue-detail-tags"></div>
+
+        <div class="mrow">
+            <div class="mf" id="mf-issue-invoice">
+                <label>Invoice / Reference ID *</label>
+                <input type="text" id="issue-invoice-id" placeholder="e.g. ISS-2026-001" />
+            </div>
+            <div class="mf" id="mf-issue-qty">
+                <label>Quantity to Issue *</label>
+                <input type="number" id="issue-qty" min="1" value="1" />
+            </div>
+        </div>
+        <div class="mf">
+            <label>Issued To (Department / Person)</label>
+            <input type="text" id="issue-recipient" placeholder="e.g. Maintenance Dept" />
+        </div>
+        <div class="mf">
+            <label>Reason / Purpose</label>
+            <select id="issue-reason">
+                <option>Maintenance</option>
+                <option>Project Use</option>
+                <option>Sales Order</option>
+                <option>Internal Consumption</option>
+                <option>Damaged / Write-off</option>
+                <option>Other</option>
+            </select>
+        </div>
+        <div class="mf">
+            <label>Notes</label>
+            <input type="text" id="issue-notes" placeholder="Any additional notes…" />
+        </div>
+
+        <div class="modal-footer">
+            <button class="mbtn mbtn-ghost" id="issue-details-back">← Back</button>
+            <button class="mbtn mbtn-issue" id="issue-details-submit">✓ Confirm Issue</button>
+        </div>
+    </div>
+</div>

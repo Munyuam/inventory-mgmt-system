@@ -14,7 +14,7 @@ const initDb = (userDataPath) => {
 
   // Initialize tables
   db.exec(`
-      CREATE TABLE IF NOT EXISTS items (
+      CREATE TABLE IF NOT EXISTS products (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT NOT NULL,
         category TEXT DEFAULT 'General',
@@ -34,14 +34,14 @@ const initDb = (userDataPath) => {
   return db;
 };
 
-async function getItems(userDataPath) {
+async function getProducts(userDataPath) {
   if (!db) initDb(userDataPath);
-  return db.prepare('SELECT * FROM items').all();
+  return db.prepare('SELECT * FROM products').all();
 }
 
-async function addItem(userDataPath, name, quantity, price, category = 'General') {
+async function addProduct(userDataPath, name, quantity, price, category = 'General') {
   if (!db) initDb(userDataPath);
-  const stmt = db.prepare('INSERT INTO items (name, quantity, price, category) VALUES (?, ?, ?, ?)');
+  const stmt = db.prepare('INSERT INTO products (name, quantity, price, category) VALUES (?, ?, ?, ?)');
   return stmt.run(name, quantity, price, category);
 }
 
@@ -76,9 +76,9 @@ async function authenticateUser(userDataPath, username, password) {
 
 module.exports = {
   initDb,
-  // --- Items Logic ---
-  getItems,
-  addItem,
+  // --- Products Logic ---
+  getProducts,
+  addProduct,
   // --- Auth Logic ---
   registerUser,
   authenticateUser
