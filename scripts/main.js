@@ -1,7 +1,7 @@
 const { app, BrowserWindow, ipcMain } = require('electron')
 const path = require('node:path')
 const db = require('../database.js')
-const { logAction } = require('../services/logger.js')
+const { logAction, getAuditLogs } = require('../services/logger.js')
 
 const createWindow = () => {
     const win = new BrowserWindow({
@@ -26,6 +26,10 @@ app.whenReady().then(() => {
 
     ipcMain.handle('get-products', () => {
         return db.getProducts(userDataPath);
+    });
+
+    ipcMain.handle('get-transactions', () => {
+        return db.getTransactions(userDataPath);
     });
 
     ipcMain.handle('auth-signup', async (event, { username, email, password }) => {
@@ -94,6 +98,10 @@ app.whenReady().then(() => {
     ipcMain.handle('emit-log', (event, { action, details }) => {
         const username = currentUser ? currentUser.username : 'Guest';
         logAction(username, action, details);
+    });
+
+    ipcMain.handle('get-audit-logs', async () => {
+        return getAuditLogs(200); // return up to 200 logs by default
     });
 
     ipcMain.handle('issue-product', async (event, data) => {

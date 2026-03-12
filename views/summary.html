@@ -1,4 +1,19 @@
-<div class="content-card">
-    <div class="card-header">Stock Summary</div>
-    <p class="placeholder-text">Inventory summaries and analytics coming soon...</p>
+<div class="summary-header">
+    <div class="pv-header-text">
+        <h3>Weekly Transaction Summary</h3>
+        <p>View product movements and revenue for specific weeks.</p>
+    </div>
+    <div class="summary-actions">
+        <label for="week-selector">Select Week:</label>
+        <select id="week-selector" class="mselect">
+            <option value="all">All Weeks</option>
+        </select>
+    </div>
+</div>
+
+<div class="summary-view-container" id="summary-view-content">
+    <div class="view-loader active" id="summary-loader">
+        <div class="spinner"></div>
+        <p>Generating weekly summaries...</p>
+    </div>
 </div>

@@ -27,4 +27,24 @@
             <button type="button" class="submit-btn bg-error" id="settings-change-pwd-btn">Change Password</button>
         </form>
     </div>
+
+    <!-- System Monitor -->
+    <div class="content-card" style="grid-column: 1 / -1; margin-top: 10px;">
+        <div class="card-header" style="display:flex; justify-content:space-between; align-items:center;">
+            <span>System Information</span>
+            <button class="sysmon-btn" id="settings-sysmon-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                    class="lucide lucide-monitor">
+                    <rect width="20" height="14" x="2" y="3" rx="2" />
+                    <line x1="8" x2="16" y1="21" y2="21" />
+                    <line x1="12" x2="12" y1="17" y2="21" />
+                </svg>
+                <span>System Monitor</span>
+            </button>
+        </div>
+        <div id="settings-sysmon-container" class="sysmon-log-view">
+            <div id="settings-sysmon-content" style="white-space: pre-wrap;"></div>
+        </div>
+    </div>
 </div>

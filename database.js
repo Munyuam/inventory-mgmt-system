@@ -106,6 +106,17 @@ async function getProducts(userDataPath) {
 }
 
 
+async function getTransactions(userDataPath) {
+  if (!db) initDb(userDataPath);
+  return db.prepare(`
+    SELECT t.*, p.product_name, p.product_category, ii.unit_cost
+    FROM transactions t
+    JOIN products p ON t.product_id = p.product_id
+    LEFT JOIN invoice_items ii ON t.invoice_item_id = ii.invoice_items_id
+    ORDER BY t.transaction_date DESC
+  `).all();
+}
+
 async function addProduct(userDataPath, name, price, category = 'General') {
   if (!db) initDb(userDataPath);
   const stmt = db.prepare('INSERT INTO products (product_name, unit_price, product_category) VALUES (?, ?, ?)');
@@ -319,6 +330,7 @@ module.exports = {
   initDb,
   // --- Products Logic ---
   getProducts,
+  getTransactions,
   addProduct,
   issueProduct,
   updateProduct,

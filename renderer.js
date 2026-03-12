@@ -1,18 +1,19 @@
 const loadProducts = async () => {
     const products = await window.api.getProducts();
 
-    // --- Update Dashboard Stats (if on dashboard) ---
     const listElement = document.getElementById('inventoryList');
     if (listElement) listElement.innerHTML = '';
 
     let totalQuantity = 0;
     let lowStockCount = 0;
-    let totalValue = 0;
+    let totalRevenue = 0;
+    let totalCost = 0;
     const categories = {};
 
     products.forEach(item => {
         totalQuantity += item.quantity;
-        totalValue += (item.unit_price * item.quantity);
+        totalRevenue += (item.unit_price * item.quantity);
+        totalCost += ((item.unit_cost || 0) * item.quantity);
         if (item.quantity < 10) lowStockCount++;
 
         const cat = item.product_category || 'General';
@@ -40,7 +41,16 @@ const loadProducts = async () => {
 
     if (document.getElementById('stat-total')) document.getElementById('stat-total').textContent = products.length;
     if (document.getElementById('stat-low')) document.getElementById('stat-low').textContent = lowStockCount;
-    if (document.getElementById('stat-value')) document.getElementById('stat-value').textContent = `MK${totalValue.toFixed(2)}`;
+    if (document.getElementById('stat-value')) document.getElementById('stat-value').textContent = `MK${totalRevenue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
+    if (document.getElementById('stat-cost')) document.getElementById('stat-cost').textContent = `MK${totalCost.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
+    const estimatedProfit = totalRevenue - totalCost;
+    const profitEl = document.getElementById('stat-profit');
+    if (profitEl) {
+        profitEl.textContent = `MK${estimatedProfit.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        profitEl.style.color = estimatedProfit >= 0 ? '#10b981' : '#ef4444'; // Green for profit, red for loss
+    }
 
     // Ranking "Most Issued" Products
     const mostIssued = [...products].sort((a, b) => b.issued_count - a.issued_count).slice(0, 5);
@@ -85,15 +95,13 @@ const loadProducts = async () => {
     }
 };
 
+let categoryChart = null;
+
 const updateCharts = (categoryData, mostIssuedProducts) => {
-    // TEMPORARY: Use descriptive dummy data as requested
-    categoryData = {
-        'Electronics & Gadgets': 35,
-        'Office Furniture': 25,
-        'Stationery Supplies': 20,
-        'Maintenance Tools': 15,
-        'Employee Gear': 5
-    };
+    // If there is no data, provide a fallback so the chart doesn't break
+    if (Object.keys(categoryData).length === 0) {
+        categoryData = { 'No Products': 1 };
+    }
 
     const ctxCategory = document.getElementById('categoryChart');
     if (!ctxCategory) return;
@@ -261,6 +269,170 @@ const updateGreeting = (user) => {
     dateElement.textContent = new Date().toLocaleDateString(undefined, options);
 };
 
+// --- Weekly Summary Logic ---
+const loadWeeklySummary = async () => {
+    const container = document.getElementById('summary-view-content');
+    const selector = document.getElementById('week-selector');
+    if (!container) return;
+
+    try {
+        const transactions = await window.api.getTransactions();
+        if (!transactions || transactions.length === 0) {
+            container.innerHTML = '<div class="content-card">No transactions found to generate summary.</div>';
+            return;
+        }
+
+        // Grouping: MondayDate -> ProductID -> data
+        const weeklyData = {};
+
+        transactions.forEach(t => {
+            const date = new Date(t.transaction_date);
+            const day = date.getDay();
+            const diff = date.getDate() - day + (day === 0 ? -6 : 1);
+            const monday = new Date(date.setDate(diff)).toISOString().split('T')[0];
+
+            if (!weeklyData[monday]) weeklyData[monday] = {};
+
+            const pid = t.product_id;
+            if (!weeklyData[monday][pid]) {
+                weeklyData[monday][pid] = {
+                    name: t.product_name,
+                    purchased: 0,
+                    issued: 0,
+                    price: t.unit_price || 0,
+                    revenue: 0
+                };
+            }
+
+            if (t.transaction_type === 'Procurement') {
+                weeklyData[monday][pid].purchased += t.quantity;
+            } else if (t.transaction_type === 'Issue') {
+                weeklyData[monday][pid].issued += t.quantity;
+            }
+
+            const p = weeklyData[monday][pid];
+            p.stockLevel = p.purchased - p.issued;
+            p.revenue = p.stockLevel * p.price;
+        });
+
+        const weeks = Object.keys(weeklyData).sort((a, b) => new Date(b) - new Date(a));
+
+        // Helper to format date range
+        const getWeekStr = (monday) => {
+            const startDate = new Date(monday);
+            const endDate = new Date(monday);
+            endDate.setDate(startDate.getDate() + 6);
+            return `${startDate.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })} - ${endDate.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}`;
+        };
+
+        // Populate selector if it's the first load or if weeks changed
+        if (selector && selector.options.length <= 1) {
+            weeks.forEach(monday => {
+                const opt = document.createElement('option');
+                opt.value = monday;
+                opt.textContent = `Week of ${getWeekStr(monday)}`;
+                selector.appendChild(opt);
+            });
+
+            selector.addEventListener('change', () => renderSelectedWeeks());
+        }
+
+        const renderSelectedWeeks = () => {
+            const selected = selector.value;
+            const targetWeeks = selected === 'all' ? weeks : [selected];
+
+            let html = '';
+            const tableIds = [];
+
+            targetWeeks.forEach((monday, wIdx) => {
+                const weekProducts = weeklyData[monday];
+                let weekTotalRevenue = 0;
+                const dateStr = getWeekStr(monday);
+                const tableId = `summary-dt-${wIdx}`;
+                tableIds.push({ id: tableId, label: dateStr });
+
+                let tableRows = '';
+                Object.values(weekProducts).forEach(p => {
+                    weekTotalRevenue += p.revenue;
+                    tableRows += `
+                        <tr>
+                            <td><strong>${p.name}</strong></td>
+                            <td><span class="badge ${p.stockLevel < 5 ? 'badge-low' : 'badge-ok'}">${p.stockLevel}</span></td>
+                            <td>${p.purchased}</td>
+                            <td>${p.issued}</td>
+                            <td>MK${p.price.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+                            <td class="sum-revenue">MK${p.revenue.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+                        </tr>
+                    `;
+                });
+
+                html += `
+                    <div class="weekly-card">
+                        <div class="weekly-header">
+                            <div class="weekly-title">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                                Week of ${dateStr}
+                            </div>
+                            <div class="weekly-stats">
+                                <div class="w-stat">
+                                    <span class="w-stat-label">Total Weekly Accumulated Revenue</span>
+                                    <span class="w-stat-value">MK${weekTotalRevenue.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="products-table-wrap">
+                            <table id="${tableId}" class="display" style="width:100%">
+                                <thead>
+                                    <tr>
+                                        <th>Product Name</th>
+                                        <th>Stock Level</th>
+                                        <th>Purchased</th>
+                                        <th>Issued</th>
+                                        <th>Unit Price</th>
+                                        <th>Revenue</th>
+                                    </tr>
+                                </thead>
+                                <tbody>${tableRows}</tbody>
+                            </table>
+                        </div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+
+            if (typeof $ !== 'undefined' && $.fn.DataTable) {
+                tableIds.forEach(item => {
+                    $(`#${item.id}`).DataTable({
+                        dom: 'Bfrtip',
+                        buttons: [
+                            {
+                                extend: 'excelHtml5',
+                                text: 'Export to Excel',
+                                className: 'btn-export-excel',
+                                title: `Weekly Summary - ${item.label}`
+                            }
+                        ],
+                        pageLength: 5,
+                        lengthMenu: [5, 10, 25, 50],
+                        order: [[0, 'asc']],
+                        language: {
+                            search: "_INPUT_",
+                            searchPlaceholder: "Filter products..."
+                        }
+                    });
+                });
+            }
+        };
+
+        renderSelectedWeeks();
+
+    } catch (err) {
+        console.error('Weekly summary error:', err);
+        container.innerHTML = `<div class="content-card" style="color:var(--bg-error)">Failed to load weekly summary: ${err.message}</div>`;
+    }
+};
+
 // --- Navigation Logic (Dynamic Loading) ---
 const loadView = async (viewName) => {
     const loader = document.getElementById('view-loader');
@@ -295,6 +467,12 @@ const loadView = async (viewName) => {
                 window.initProductsView();
             }
             await loadProducts();
+        } else if (viewName === 'summary') {
+            await loadWeeklySummary();
+        } else if (viewName === 'activity') {
+            if (typeof window.initActivityView === 'function') {
+                window.initActivityView();
+            }
         } else if (viewName === 'settings') {
             const user = await window.api.getCurrentUser();
             if (user) {
@@ -357,6 +535,49 @@ const loadView = async (viewName) => {
 
                 btn.textContent = 'Change Password';
                 btn.disabled = false;
+            });
+
+            // System Monitor Handler
+            document.getElementById('settings-sysmon-btn')?.addEventListener('click', async () => {
+                const container = document.getElementById('settings-sysmon-container');
+                const content = document.getElementById('settings-sysmon-content');
+                if (!container || !content) return;
+
+                // Toggle visibility
+                if (container.style.display !== 'none') {
+                    container.style.display = 'none';
+                    return;
+                }
+
+                container.style.display = 'flex';
+                content.innerHTML = '<span style="color:#aaa;">Fetching system logs...</span>';
+
+                try {
+                    const logs = await window.api.getAuditLogs();
+                    if (!logs || logs.length === 0) {
+                        content.innerHTML = '<span style="color:#888;">No logs found.</span>';
+                        return;
+                    }
+
+                    // Neatly format logs with color coding and structured classes
+                    const formattedLogs = logs.map(log => {
+                        const match = log.match(/^\[(.*?)\]\s+\[User:\s+(.*?)\]\s+Action:\s+(.*?)\s+-\s+(.*)$/);
+                        if (match) {
+                            const [_, time, user, action, details] = match;
+                            return `<div class="log-entry">
+                                <span class="log-time">[${time}]</span>
+                                <span class="log-user">${user}:</span>
+                                <span class="log-action">${action}</span>
+                                <span class="log-details">${details}</span>
+                            </div>`;
+                        }
+                        return `<div class="log-entry">${log}</div>`;
+                    }).join('');
+
+                    content.innerHTML = formattedLogs;
+                } catch (err) {
+                    content.innerHTML = `<span style="color:#f87171;">Failed to load logs: ${err.message}</span>`;
+                }
             });
         }
         // Other views are self-contained
@@ -484,6 +705,15 @@ window.initProductsView = function () {
         if (typeof $ === 'undefined' || typeof $.fn.DataTable === 'undefined') return;
         if (dtInstance) return;                         // already inited
         dtInstance = $('#products-dt').DataTable({
+            dom: 'Blfrtip',
+            buttons: [
+                {
+                    extend: 'excelHtml5',
+                    text: 'Export to Excel',
+                    className: 'btn-export-excel',
+                    title: 'Product Inventory List'
+                }
+            ],
             pageLength: 10,
             language: {
                 emptyTable: 'No products yet. Click "Add Product" to get started.',
@@ -825,9 +1055,19 @@ window.initProductsView = function () {
                 const id = String(data[0]);
                 const name = data[1].replace(/<\/?[^>]+(>|$)/g, "").trim();
                 const qtyText = data[5].replace(/<\/?[^>]+(>|$)/g, "").trim();
-                const priceText = String(data[6]).replace('MK', '').trim();
+                const costText = String(data[6]).replace('MK', '').trim();
+                const priceText = String(data[7]).replace('MK', '').trim();
                 const invoiceNumber = String(data[4] || '').trim();
-                rows.push({ id, name, category: data[2], qty: qtyText, price: parseFloat(priceText) || 0, invoiceNumber, idx: rowIdx });
+                rows.push({
+                    id,
+                    name,
+                    category: data[2],
+                    qty: qtyText,
+                    cost: parseFloat(costText) || 0,
+                    price: parseFloat(priceText) || 0,
+                    invoiceNumber,
+                    idx: rowIdx
+                });
             });
         } else {
             document.querySelectorAll('#products-tbody tr').forEach((tr, i) => {
@@ -835,13 +1075,15 @@ window.initProductsView = function () {
                 if (tds.length >= 7) {
                     const id = tds[0].textContent.trim();
                     const name = tds[1].textContent.trim();
-                    const priceText = tds[6].textContent.replace('MK', '').trim();
+                    const costText = tds[6].textContent.replace('MK', '').trim();
+                    const priceText = tds[7].textContent.replace('MK', '').trim();
                     const invoiceNumber = tds[4].textContent.trim();
                     rows.push({
                         id,
                         name,
                         category: tds[2].textContent.trim(),
                         qty: tds[5].textContent.trim(),
+                        cost: parseFloat(costText) || 0,
                         price: parseFloat(priceText) || 0,
                         invoiceNumber,
                         idx: i
@@ -913,7 +1155,7 @@ window.initProductsView = function () {
 
     document.getElementById('issue-details-back')?.addEventListener('click', () => openModal('modal-issue-select'));
 
-    document.getElementById('issue-details-submit')?.addEventListener('click', () => {
+    document.getElementById('issue-details-submit')?.addEventListener('click', async () => {
         const invoiceId = document.getElementById('issue-invoice-id').value.trim();
         const qty = parseInt(document.getElementById('issue-qty').value) || 0;
         const stockQty = parseInt(issueSelected?.qty) || 0;
@@ -923,30 +1165,28 @@ window.initProductsView = function () {
         if (qty < 1) { showFeedback('Quantity must be at least 1.', 'error'); return; }
         if (qty > stockQty) { showFeedback(`Only ${stockQty} units available.`, 'error'); return; }
 
-        // Update badge in DataTable / table row
-        const newQty = stockQty - qty;
-        if (typeof $ !== 'undefined' && dtInstance) {
-            const rowData = dtInstance.row(issueSelected.idx).data();
-            rowData[5] = `<span class="badge ${newQty < 10 ? 'badge-low' : 'badge-ok'}">${newQty}</span>`;
-            dtInstance.row(issueSelected.idx).data(rowData).draw(false);
-        }
-
         // Log the issuance in audit log
         const reason = document.getElementById('issue-reason')?.value || 'Issue';
         window.api.logAction('Issue Product', `Issued ${qty} units of "${issueSelected.name}" (Ref: ${invoiceId}) — Reason: ${reason}`);
 
         // Persist to database
-        window.api.issueProduct({
+        const result = await window.api.issueProduct({
             product_id: issueSelected.id,
             quantity: qty,
             transaction_date: new Date().toISOString().split('T')[0],
             transaction_description: `${reason} — Ref: ${invoiceId}`,
-            unit_price: issueSelected.price
+            unit_price: issueSelected.price // Using Selling Price
         });
 
-        closeAll();
-        showFeedback(`Issued ${qty}× "${issueSelected.name}" — ${reason}`, 'success');
-        issueSelected = null;
+        if (result && result.changes > 0) {
+            // Re-load all products to ensure everything is fresh
+            await loadProducts();
+            closeAll();
+            showFeedback(`Issued ${qty}× "${issueSelected.name}" — ${reason}`, 'success');
+            issueSelected = null;
+        } else {
+            showFeedback('Failed to save issue transaction to database.', 'error');
+        }
     });
 
     /* close on backdrop click & ESC */
@@ -978,3 +1218,148 @@ document.addEventListener('DOMContentLoaded', async () => {
     setupNavigation();
     setupUserMenu();
 });
+
+// --- Activity / Movement Schedule Logic ---
+window.initActivityView = async function () {
+    const productSelector = document.getElementById('schedule-product-selector');
+    if (!productSelector) return;
+
+    try {
+        const products = await window.api.getProducts();
+        products.forEach(p => {
+            const opt = document.createElement('option');
+            opt.value = p.product_id;
+            opt.textContent = p.product_name;
+            productSelector.appendChild(opt);
+        });
+
+        productSelector.addEventListener('change', (e) => {
+            loadMovementSchedule(parseInt(e.target.value));
+        });
+    } catch (err) {
+        console.error('Failed to init Activity view:', err);
+    }
+};
+
+const loadMovementSchedule = async (productId) => {
+    const tableBody = document.getElementById('movement-schedule-tbody');
+    const tableCard = document.getElementById('schedule-table-card');
+    const placeholder = document.getElementById('schedule-placeholder');
+    if (!tableBody) return;
+
+    try {
+        const transactions = await window.api.getTransactions();
+        // Filter and sort transactions for the selected product
+        const pTrans = transactions
+            .filter(t => t.product_id === productId)
+            .sort((a, b) => new Date(a.transaction_date) - new Date(b.transaction_date));
+
+        if (pTrans.length === 0) {
+            tableBody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:30px; color:var(--text-muted);">No transaction history for this product.</td></tr>';
+            tableCard.style.display = 'block';
+            placeholder.style.display = 'none';
+            return;
+        }
+
+        // Monthly grouping
+        const monthlyData = {};
+        let runningBalance = 0;
+
+        pTrans.forEach(t => {
+            const date = new Date(t.transaction_date);
+            const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+            const monthLabel = date.toLocaleDateString(undefined, { month: 'long', year: 'numeric' });
+
+            if (!monthlyData[monthKey]) {
+                monthlyData[monthKey] = {
+                    label: monthLabel,
+                    opening: runningBalance,
+                    purchases: 0,
+                    adjust: 0,
+                    sales: 0,
+                    totalPurchasesVal: 0,
+                    salesValue: 0
+                };
+            }
+
+            const m = monthlyData[monthKey];
+            if (t.transaction_type === 'Procurement') {
+                m.purchases += t.quantity;
+                m.totalPurchasesVal += (t.quantity * (t.unit_cost || 0));
+                runningBalance += t.quantity;
+            } else if (t.transaction_type === 'Issue') {
+                m.sales += t.quantity;
+                m.salesValue += (t.quantity * (t.unit_price || 0));
+                runningBalance -= t.quantity;
+            }
+
+            m.hand = runningBalance;
+        });
+
+        // Convert grouped data to rows
+        let html = '';
+
+        // Add the initial Opening Balance row as requested
+        const keys = Object.keys(monthlyData).sort();
+        if (keys.length > 0) {
+            const firstMonth = monthlyData[keys[0]];
+            html += `
+                <tr style="background: hsla(222, 30%, 50%, 0.05); font-style: italic;">
+                    <td><strong>Stock Opening Balance</strong></td>
+                    <td>—</td>
+                    <td>—</td>
+                    <td>—</td>
+                    <td><span class="badge badge-ok">${firstMonth.opening}</span></td>
+                    <td>—</td>
+                    <td>—</td>
+                </tr>
+            `;
+        }
+
+        keys.forEach(key => {
+            const m = monthlyData[key];
+            html += `
+                <tr>
+                    <td><strong>${m.label}</strong></td>
+                    <td>${m.purchases}</td>
+                    <td>${m.adjust}</td>
+                    <td>${m.sales}</td>
+                    <td><span class="badge ${m.hand < 5 ? 'badge-low' : 'badge-ok'}">${m.hand}</span></td>
+                    <td>MK${m.totalPurchasesVal.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+                    <td>MK${m.salesValue.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+                </tr>
+            `;
+        });
+
+        tableBody.innerHTML = html;
+        tableCard.style.display = 'block';
+        placeholder.style.display = 'none';
+
+        // Re-init DataTable if it exists
+        if ($.fn.DataTable.isDataTable('#movement-schedule-dt')) {
+            $('#movement-schedule-dt').DataTable().destroy();
+        }
+
+        $('#movement-schedule-dt').DataTable({
+            dom: 'Bfrtip',
+            buttons: [
+                {
+                    extend: 'excelHtml5',
+                    text: 'Export to Excel',
+                    className: 'btn-export-excel',
+                    title: `Inventory Movement - Product ${productId}`
+                }
+            ],
+            pageLength: 12,
+            lengthMenu: [12, 24, 48],
+            order: [[0, 'desc']],
+            language: {
+                search: "_INPUT_",
+                searchPlaceholder: "Filter months..."
+            }
+        });
+
+    } catch (err) {
+        console.error('Movement schedule error:', err);
+    }
+};

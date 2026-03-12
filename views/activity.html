@@ -1,4 +1,53 @@
-<div class="content-card">
-    <div class="card-header">Stock Activity</div>
-    <p class="placeholder-text">Stock activity timeline coming soon...</p>
+<div class="pv-header">
+    <div class="pv-header-text">
+        <h3 style="margin-bottom: 8px; text-transform: uppercase;">Inventory Movement Schedule</h3>
+        <p style="margin: 0; color: var(--text-muted); font-size: 0.9rem;">Analyze monthly stock movements and values
+            for individual products.</p>
+    </div>
+    <div class="pv-header-actions">
+        <div class="summary-actions" style="margin-top: 16px;">
+            <label for="schedule-product-selector">Select Product:</label>
+            <select id="schedule-product-selector" class="mselect">
+                <option value="" disabled selected>Choose a product...</option>
+            </select>
+        </div>
+    </div>
+</div>
+
+<div id="schedule-table-card" class="content-card"
+    style="display: none; padding: 0; overflow: hidden; border-radius: 12px; border: 1px solid var(--border-subtle);">
+    <div class="products-table-wrap" style="border: none; border-radius: 0; margin-bottom: 0; box-shadow: none;">
+        <table id="movement-schedule-dt" class="display" style="width:100%">
+            <thead>
+                <tr>
+                    <th>Details</th>
+                    <th>purchases qty</th>
+                    <th>Adjust. QTY</th>
+                    <th>Issue Qty</th>
+                    <th>QTY on Hand</th>
+                    <th>Total Purchases</th>
+                    <th>Sales Value</th>
+                </tr>
+            </thead>
+            <tbody id="movement-schedule-tbody"></tbody>
+        </table>
+    </div>
+</div>
+
+<div id="schedule-placeholder" class="content-card" style="text-align: center; padding: 60px 20px;">
+    <div
+        style="background: var(--bg-surface); width: 64px; height: 64px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
+            <rect x="8" y="2" width="8" height="4" rx="1" ry="1" />
+            <path d="M12 11h4" />
+            <path d="M12 16h4" />
+            <path d="M8 11h.01" />
+            <path d="M8 16h.01" />
+        </svg>
+    </div>
+    <h4 style="margin: 0 0 8px; color: var(--text-main);">Retrieve Product Schedule</h4>
+    <p style="margin: 0; color: var(--text-muted); font-size: 0.9rem;">Select a product from the dropdown to view its
+        detailed inventory movement history.</p>
 </div>
