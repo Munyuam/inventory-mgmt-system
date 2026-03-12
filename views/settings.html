@@ -1,31 +1,30 @@
 <div class="settings-grid">
     <div class="content-card">
         <div class="card-header">Profile Management</div>
-        <form class="auth-form">
+        <form class="auth-form" id="settings-profile-form">
             <div class="input-group">
                 <label>Display Name</label>
-                <input type="text" value="John Doe">
+                <input type="text" id="settings-username" placeholder="Loading...">
             </div>
             <div class="input-group">
                 <label>Email Address</label>
-                <input type="email" value="john.doe@example.com">
+                <input type="email" id="settings-email" placeholder="Loading...">
             </div>
-            <button type="button" class="submit-btn" onclick="alert('Profile Updated!')">Update Profile</button>
+            <button type="button" class="submit-btn" id="settings-update-profile-btn">Update Profile</button>
         </form>
     </div>
     <div class="content-card">
         <div class="card-header">Security</div>
-        <form class="auth-form">
+        <form class="auth-form" id="settings-security-form">
             <div class="input-group">
                 <label>Current Password</label>
-                <input type="password" placeholder="••••••••">
+                <input type="password" id="settings-cur-pass" placeholder="••••••••">
             </div>
             <div class="input-group">
                 <label>New Password</label>
-                <input type="password" placeholder="••••••••">
+                <input type="password" id="settings-new-pass" placeholder="••••••••">
             </div>
-            <button type="button" class="submit-btn bg-error" onclick="alert('Password Changed!')">Change
-                Password</button>
+            <button type="button" class="submit-btn bg-error" id="settings-change-pwd-btn">Change Password</button>
         </form>
     </div>
 </div>

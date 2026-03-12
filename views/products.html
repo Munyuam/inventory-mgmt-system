@@ -666,9 +666,11 @@
                 <th>Product Name</th>
                 <th>Category</th>
                 <th>Supplier</th>
-                <th>Invoice</th>
+                <th>Reference</th>
                 <th>Qty Available</th>
+                <th>Unit Cost (MK)</th>
                 <th>Unit Price (MK)</th>
+                <th>Actions</th>
             </tr>
         </thead>
         <tbody id="products-tbody"></tbody>
@@ -854,8 +856,16 @@
                 <input type="number" id="prod-qty" min="0" value="1" />
             </div>
             <div class="mf">
+                <label>Unit Cost (MK) <span style="font-weight:400;opacity:0.6">— from invoice</span></label>
+                <input type="number" id="prod-price" min="0" step="0.01" readonly
+                    style="opacity:0.65;cursor:not-allowed" />
+            </div>
+        </div>
+
+        <div class="mrow">
+            <div class="mf" id="mf-prod-unit-price">
                 <label>Unit Price (MK) *</label>
-                <input type="number" id="prod-price" min="0" step="0.01" />
+                <input type="number" id="prod-unit-price" min="0" step="0.01" placeholder="Selling price" />
             </div>
         </div>
 
@@ -928,36 +938,170 @@
         <div class="mrow">
             <div class="mf" id="mf-issue-invoice">
                 <label>Invoice / Reference ID *</label>
-                <input type="text" id="issue-invoice-id" placeholder="e.g. ISS-2026-001" />
+                <input type="text" id="issue-invoice-id" placeholder="e.g. ISS-2026-001" readonly />
             </div>
             <div class="mf" id="mf-issue-qty">
                 <label>Quantity to Issue *</label>
                 <input type="number" id="issue-qty" min="1" value="1" />
             </div>
         </div>
+
         <div class="mf">
-            <label>Issued To (Department / Person)</label>
-            <input type="text" id="issue-recipient" placeholder="e.g. Maintenance Dept" />
-        </div>
-        <div class="mf">
-            <label>Reason / Purpose</label>
+            <label>Issue Reason</label>
             <select id="issue-reason">
-                <option>Maintenance</option>
-                <option>Project Use</option>
-                <option>Sales Order</option>
-                <option>Internal Consumption</option>
+                <option>Customer Sale</option>
                 <option>Damaged / Write-off</option>
+                <option>Expired Stock</option>
+                <option>Staff Consumption</option>
+                <option>Promotional Giveaway</option>
+                <option>Stock Return to Supplier</option>
+                <option>Theft / Shrinkage</option>
+                <option>Internal Use</option>
                 <option>Other</option>
             </select>
-        </div>
-        <div class="mf">
-            <label>Notes</label>
-            <input type="text" id="issue-notes" placeholder="Any additional notes…" />
         </div>
 
         <div class="modal-footer">
             <button class="mbtn mbtn-ghost" id="issue-details-back">← Back</button>
             <button class="mbtn mbtn-issue" id="issue-details-submit">✓ Confirm Issue</button>
+        </div>
+    </div>
+</div>
+
+<!-- ===================== EDIT PRODUCT MODAL ===================== -->
+<div class="modal-backdrop" id="modal-edit-product">
+    <div class="modal-box">
+        <div class="modal-header">
+            <h2>Edit Product</h2>
+            <div class="subtitle">Update product details</div>
+        </div>
+        <div class="modal-body">
+            <input type="hidden" id="edit-prod-id" />
+
+            <div class="mf">
+                <label>Product Name *</label>
+                <input type="text" id="edit-prod-name" />
+            </div>
+
+            <div class="mrow">
+                <div class="mf">
+                    <label>Category *</label>
+                    <select id="edit-prod-category">
+                        <option>Beverages</option>
+                        <option>Snacks</option>
+                        <option>Dairy &amp; Eggs</option>
+                        <option>Household</option>
+                        <option>Personal Care</option>
+                        <option>Frozen Foods</option>
+                        <option>Bakery</option>
+                        <option>Produce</option>
+                        <option>Meat &amp; Seafood</option>
+                        <option>Canned Goods</option>
+                        <option>General</option>
+                    </select>
+                </div>
+                <div class="mf">
+                    <label>Selling Price (MK) *</label>
+                    <input type="number" id="edit-prod-price" min="0" step="0.01" />
+                </div>
+            </div>
+
+            <div class="mf">
+                <label>Description</label>
+                <input type="text" id="edit-prod-desc" />
+            </div>
+
+            <div class="mrow"
+                style="margin-top: 10px; background: rgba(0,0,0,0.03); padding: 10px; border-radius: 6px;">
+                <div class="mf" style="margin-bottom: 0;">
+                    <label style="color: var(--text-muted); font-size: 0.8rem;">Current Stock</label>
+                    <div id="edit-prod-stock" style="font-weight: 500;">0</div>
+                </div>
+                <div class="mf" style="margin-bottom: 0;">
+                    <label style="color: var(--text-muted); font-size: 0.8rem;">Unit Cost (MK)</label>
+                    <div id="edit-prod-cost" style="font-weight: 500;">0.00</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-footer">
+            <button class="mbtn mbtn-ghost"
+                onclick="document.getElementById('modal-edit-product').classList.remove('open')">Cancel</button>
+            <button class="mbtn mbtn-primary" id="edit-prod-submit">Save Changes</button>
+        </div>
+    </div>
+</div>
+
+<!-- ===================== VIEW PRODUCT MODAL ===================== -->
+<div class="modal-backdrop" id="modal-view-product">
+    <div class="modal-box">
+        <div class="modal-header">
+            <h2>Product Details</h2>
+            <div class="subtitle" id="view-prod-subtitle">ID #0</div>
+        </div>
+        <div class="modal-body">
+            <div class="mrow"
+                style="background: rgba(0,0,0,0.03); padding: 10px; border-radius: 6px; margin-bottom: 14px;">
+                <div class="mf" style="margin-bottom: 0;">
+                    <label style="color: var(--text-muted); font-size: 0.8rem;">Name</label>
+                    <div id="view-prod-name" style="font-weight: 600; font-size: 1.1rem;">-</div>
+                </div>
+                <div class="mf" style="margin-bottom: 0; text-align: right;">
+                    <label style="color: var(--text-muted); font-size: 0.8rem;">Category</label>
+                    <div id="view-prod-category" style="font-weight: 500;">-</div>
+                </div>
+            </div>
+
+            <div class="mf" style="margin-bottom: 14px;">
+                <label style="color: var(--text-muted); font-size: 0.8rem;">Description</label>
+                <div id="view-prod-desc" style="font-size: 0.95rem;">-</div>
+            </div>
+
+            <div class="mrow" style="margin-bottom: 14px;">
+                <div class="mf" style="margin-bottom: 0;">
+                    <label style="color: var(--text-muted); font-size: 0.8rem;">Current Stock Available</label>
+                    <div id="view-prod-stock" style="font-weight: 600; font-size: 1.2rem; color: var(--primary);">0
+                    </div>
+                </div>
+                <div class="mf" style="margin-bottom: 0;">
+                    <label style="color: var(--text-muted); font-size: 0.8rem;">Total Issued</label>
+                    <div id="view-prod-issued" style="font-weight: 500; font-size: 1.2rem;">0</div>
+                </div>
+            </div>
+
+            <div class="mrow"
+                style="background: rgba(0,0,0,0.03); padding: 10px; border-radius: 6px; margin-bottom: 14px;">
+                <div class="mf" style="margin-bottom: 0;">
+                    <label style="color: var(--text-muted); font-size: 0.8rem;">Purchase Cost (MK)</label>
+                    <div id="view-prod-cost" style="font-weight: 500;">0.00</div>
+                </div>
+                <div class="mf" style="margin-bottom: 0;">
+                    <label style="color: var(--text-muted); font-size: 0.8rem;">Selling Price (MK)</label>
+                    <div id="view-prod-price" style="font-weight: 500; color: var(--success);">0.00</div>
+                </div>
+            </div>
+
+            <h3
+                style="font-size: 1rem; margin-top: 10px; margin-bottom: 10px; padding-bottom: 5px; border-bottom: 1px solid rgba(0,0,0,0.1);">
+                Procurement Info</h3>
+
+            <div class="mrow" style="margin-bottom: 10px;">
+                <div class="mf" style="margin-bottom: 0;">
+                    <label style="color: var(--text-muted); font-size: 0.8rem;">Supplier</label>
+                    <div id="view-prod-supplier" style="font-weight: 500;">-</div>
+                </div>
+                <div class="mf" style="margin-bottom: 0;">
+                    <label style="color: var(--text-muted); font-size: 0.8rem;">Invoice / Reference</label>
+                    <div id="view-prod-invoice" style="font-weight: 500;">-</div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="modal-footer">
+            <button class="mbtn mbtn-ghost"
+                onclick="document.getElementById('modal-view-product').classList.remove('open')"
+                style="width: 100%;">Close</button>
         </div>
     </div>
 </div>

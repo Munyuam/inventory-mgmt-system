@@ -9,5 +9,8 @@ contextBridge.exposeInMainWorld('api', {
     logout: () => ipcRenderer.invoke('logout'),
     saveProcurement: (data) => ipcRenderer.invoke('save-procurement', data),
     logAction: (action, details) => ipcRenderer.invoke('emit-log', { action, details }),
-    issueProduct: (data) => ipcRenderer.invoke('issue-product', data)
+    issueProduct: (data) => ipcRenderer.invoke('issue-product', data),
+    updateProduct: (data) => ipcRenderer.invoke('update-product', data),
+    updateProfile: (data) => ipcRenderer.invoke('update-profile', data),
+    changePassword: (data) => ipcRenderer.invoke('change-password', data)
 })

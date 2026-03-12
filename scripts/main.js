@@ -100,6 +100,36 @@ app.whenReady().then(() => {
         return db.issueProduct(userDataPath, data);
     });
 
+    ipcMain.handle('update-product', async (event, data) => {
+        const username = currentUser ? currentUser.username : 'Guest';
+        const result = db.updateProduct(userDataPath, data);
+        if (result.success) {
+            logAction(username, 'Update Product', `${username} updated product: ${data.product_name} (ID: ${data.product_id})`);
+        }
+        return result;
+    });
+
+    ipcMain.handle('update-profile', async (event, data) => {
+        if (!currentUser) return { success: false, error: 'Not logged in.' };
+        const result = await db.updateUserProfile(userDataPath, currentUser.id, data.username, data.email);
+        if (result.success) {
+            // Update the in-memory user
+            currentUser.username = data.username;
+            currentUser.email = data.email;
+            logAction(currentUser.username, 'Update Profile', `${currentUser.username} updated their profile details.`);
+        }
+        return result;
+    });
+
+    ipcMain.handle('change-password', async (event, data) => {
+        if (!currentUser) return { success: false, error: 'Not logged in.' };
+        const result = await db.changeUserPassword(userDataPath, currentUser.id, data.currentPassword, data.newPassword);
+        if (result.success) {
+            logAction(currentUser.username, 'Change Password', `${currentUser.username} changed their password.`);
+        }
+        return result;
+    });
+
     createWindow()
 
     // Open a window if none are open (macOS specific)

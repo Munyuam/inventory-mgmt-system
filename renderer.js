@@ -20,12 +20,19 @@ const loadProducts = async () => {
 
         if (listElement) {
             const row = document.createElement('tr');
+            const unitCost = item.unit_cost || 0;
+            const unitPrice = item.unit_price || 0;
+            const totalCost = unitCost * item.quantity;
+            const totalRevenue = unitPrice * item.quantity;
             row.innerHTML = `
                 <td>#${item.product_id}</td>
                 <td>${item.product_name}</td>
                 <td style="color: var(--text-muted); font-size: 0.8rem;">${cat}</td>
                 <td><span class="badge ${item.quantity < 10 ? 'badge-low' : 'badge-ok'}">${item.quantity}</span></td>
-                <td>MK${item.unit_price.toFixed(2)}</td>
+                <td>MK${unitCost.toFixed(2)}</td>
+                <td>MK${unitPrice.toFixed(2)}</td>
+                <td>MK${totalCost.toFixed(2)}</td>
+                <td>MK${totalRevenue.toFixed(2)}</td>
             `;
             listElement.appendChild(row);
         }
@@ -49,11 +56,13 @@ const loadProducts = async () => {
             // fallback: manual render
             productsTbody.innerHTML = '';
             if (products.length === 0) {
-                productsTbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:40px; color:var(--text-muted);">No products found.</td></tr>';
+                productsTbody.innerHTML = '<tr><td colspan="10" style="text-align:center; padding:40px; color:var(--text-muted);">No products found.</td></tr>';
                 return;
             }
             products.forEach((p, i) => {
                 const qtyBadge = `<span class="badge ${p.quantity < 10 ? 'badge-low' : 'badge-ok'}">${p.quantity}</span>`;
+                const unitCost = p.unit_cost || 0;
+                const unitPrice = p.unit_price || 0;
                 const row = document.createElement('tr');
                 row.innerHTML = `
                     <td>${p.product_id}</td>
@@ -62,7 +71,14 @@ const loadProducts = async () => {
                     <td>${p.supplier_name || '—'}</td>
                     <td>${p.invoice_number || '—'}</td>
                     <td>${qtyBadge}</td>
-                    <td>MK${parseFloat(p.unit_price).toFixed(2)}</td>`;
+                    <td>MK${parseFloat(unitCost).toFixed(2)}</td>
+                    <td>MK${parseFloat(unitPrice).toFixed(2)}</td>
+                    <td>
+                        <div style="display:flex; gap: 6px;">
+                            <button class="mbtn mbtn-ghost" style="padding:4px 8px;font-size:0.8rem;border:1px solid #ddd;" onclick="window.openViewProductModal(${p.product_id})">View</button>
+                            <button class="mbtn mbtn-primary" style="padding:4px 8px;font-size:0.8rem;" onclick="window.openEditProductModal(${p.product_id})">Edit</button>
+                        </div>
+                    </td>`;
                 productsTbody.appendChild(row);
             });
         }
@@ -279,6 +295,69 @@ const loadView = async (viewName) => {
                 window.initProductsView();
             }
             await loadProducts();
+        } else if (viewName === 'settings') {
+            const user = await window.api.getCurrentUser();
+            if (user) {
+                document.getElementById('settings-username').value = user.username || '';
+                document.getElementById('settings-email').value = user.email || '';
+            }
+
+            // Profile Update Handler
+            document.getElementById('settings-update-profile-btn')?.addEventListener('click', async () => {
+                const btn = document.getElementById('settings-update-profile-btn');
+                const newUsername = document.getElementById('settings-username').value.trim();
+                const newEmail = document.getElementById('settings-email').value.trim();
+
+                if (!newUsername || !newEmail) {
+                    alert('Please provide both username and email.');
+                    return;
+                }
+
+                btn.textContent = 'Updating...';
+                btn.disabled = true;
+
+                const result = await window.api.updateProfile({ username: newUsername, email: newEmail });
+                if (result.success) {
+                    alert('Profile Updated Successfully!');
+                    updateGreeting({ username: newUsername, email: newEmail }); // Refresh header
+                } else {
+                    alert(`Update Failed: ${result.error}`);
+                }
+
+                btn.textContent = 'Update Profile';
+                btn.disabled = false;
+            });
+
+            // Password Change Handler
+            document.getElementById('settings-change-pwd-btn')?.addEventListener('click', async () => {
+                const btn = document.getElementById('settings-change-pwd-btn');
+                const curPass = document.getElementById('settings-cur-pass').value;
+                const newPass = document.getElementById('settings-new-pass').value;
+
+                if (!curPass || !newPass) {
+                    alert('Please provide both current and new passwords.');
+                    return;
+                }
+                if (newPass.length < 6) {
+                    alert('New password must be at least 6 characters long.');
+                    return;
+                }
+
+                btn.textContent = 'Changing...';
+                btn.disabled = true;
+
+                const result = await window.api.changePassword({ currentPassword: curPass, newPassword: newPass });
+                if (result.success) {
+                    alert('Password Changed Successfully! Please use it on your next login.');
+                    document.getElementById('settings-cur-pass').value = '';
+                    document.getElementById('settings-new-pass').value = '';
+                } else {
+                    alert(`Change Failed: ${result.error}`);
+                }
+
+                btn.textContent = 'Change Password';
+                btn.disabled = false;
+            });
         }
         // Other views are self-contained
     } catch (error) {
@@ -438,10 +517,13 @@ window.initProductsView = function () {
 
     // Bridge for main loadProducts to refresh the DataTables table
     window.refreshProductsTableData = (products) => {
+        window.allProducts = products; // Keep a reference for editing
         if (typeof $ !== 'undefined' && dtInstance) {
             dtInstance.clear();
             products.forEach((p, i) => {
                 const qtyBadge = `<span class="badge ${p.quantity < 10 ? 'badge-low' : 'badge-ok'}">${p.quantity}</span>`;
+                const unitCost = p.unit_cost || 0;
+                const unitPrice = p.unit_price || 0;
                 dtInstance.row.add([
                     p.product_id,
                     `<strong>${p.product_name}</strong>`,
@@ -449,12 +531,90 @@ window.initProductsView = function () {
                     p.supplier_name || '—',
                     p.invoice_number || '—',
                     qtyBadge,
-                    `MK${parseFloat(p.unit_price).toFixed(2)}`
+                    `MK${parseFloat(unitCost).toFixed(2)}`,
+                    `MK${parseFloat(unitPrice).toFixed(2)}`,
+                    `<div style="display:flex; gap: 6px;">
+                        <button class="mbtn mbtn-ghost" style="padding:4px 8px;font-size:0.8rem;border:1px solid #ddd;" onclick="window.openViewProductModal(${p.product_id})">View</button>
+                        <button class="mbtn mbtn-primary" style="padding:4px 8px;font-size:0.8rem;" onclick="window.openEditProductModal(${p.product_id})">Edit</button>
+                    </div>`
                 ]);
             });
             dtInstance.draw();
         }
     };
+
+    // --- Product View Logic ---
+    window.openViewProductModal = (productId) => {
+        const product = (window.allProducts || []).find(p => p.product_id === productId);
+        if (!product) return;
+
+        document.getElementById('view-prod-subtitle').textContent = `ID #${product.product_id}`;
+        document.getElementById('view-prod-name').textContent = product.product_name || '—';
+        document.getElementById('view-prod-category').textContent = product.product_category || 'General';
+        document.getElementById('view-prod-desc').textContent = product.product_description || 'No description provided.';
+
+        document.getElementById('view-prod-stock').textContent = product.quantity || '0';
+        document.getElementById('view-prod-issued').textContent = '0'; // Stub for future sum of issues
+
+        document.getElementById('view-prod-cost').textContent = product.unit_cost ? product.unit_cost.toFixed(2) : '0.00';
+        document.getElementById('view-prod-price').textContent = product.unit_price ? product.unit_price.toFixed(2) : '0.00';
+
+        document.getElementById('view-prod-supplier').textContent = product.supplier_name || '—';
+        document.getElementById('view-prod-invoice').textContent = product.invoice_number || '—';
+
+        document.getElementById('modal-view-product').classList.add('open');
+    };
+
+    // --- Product Edit Logic ---
+    window.openEditProductModal = (productId) => {
+        const product = (window.allProducts || []).find(p => p.product_id === productId);
+        if (!product) return;
+
+        document.getElementById('edit-prod-id').value = product.product_id;
+        document.getElementById('edit-prod-name').value = product.product_name;
+        document.getElementById('edit-prod-price').value = product.unit_price ? product.unit_price.toFixed(2) : '0.00';
+        document.getElementById('edit-prod-desc').value = product.product_description || '';
+
+        // Match category dropdown
+        const catSelect = document.getElementById('edit-prod-category');
+        if (catSelect) {
+            const matchingOpt = Array.from(catSelect.options).find(o => o.value === product.product_category || o.textContent === product.product_category);
+            catSelect.value = matchingOpt ? matchingOpt.value : 'General';
+        }
+
+        document.getElementById('edit-prod-stock').textContent = product.quantity;
+        document.getElementById('edit-prod-cost').textContent = product.unit_cost ? product.unit_cost.toFixed(2) : '0.00';
+
+        document.getElementById('modal-edit-product').classList.add('open');
+    };
+
+    document.getElementById('edit-prod-submit')?.addEventListener('click', async () => {
+        const productId = parseInt(document.getElementById('edit-prod-id').value);
+        const name = document.getElementById('edit-prod-name').value.trim();
+        const category = document.getElementById('edit-prod-category').value;
+        const price = parseFloat(document.getElementById('edit-prod-price').value) || 0;
+        const desc = document.getElementById('edit-prod-desc').value.trim();
+
+        if (!name) { setErr('edit-prod-name', true); return; } else setErr('edit-prod-name', false);
+
+        const data = {
+            product_id: productId,
+            product_name: name,
+            product_category: category,
+            unit_price: price,
+            product_description: desc
+        };
+
+        const result = await window.api.updateProduct(data);
+        if (result.success) {
+            document.getElementById('modal-edit-product').classList.remove('open');
+            if (typeof loadProducts === 'function') {
+                await loadProducts();
+            }
+        } else {
+            alert('Failed to update product: ' + result.error);
+        }
+    });
 
     /* ===================== STEP 2: INVOICE ===================== */
     document.getElementById('inv-back')?.addEventListener('click', () => openModal('modal-supplier'));
@@ -471,6 +631,7 @@ window.initProductsView = function () {
             terms: document.getElementById('inv-terms')?.value || 'Cash',
             currency: document.getElementById('inv-currency')?.value || 'MK',
             notes: document.getElementById('inv-notes')?.value.trim() || '',
+            total_cost: parseFloat(document.getElementById('inv-unit-cost')?.value) || 0
         };
         document.getElementById('items-stags').innerHTML =
             stag('stag-s', '✓ ' + pState.supplier.name) +
@@ -489,7 +650,8 @@ window.initProductsView = function () {
         if (liFormOpen) {
             document.getElementById('li-name').value = '';
             document.getElementById('li-qty').value = '1';
-            document.getElementById('li-price').value = '0.00';
+            // Pre-fill the line-item unit cost with the invoice-level unit cost as a default convenience
+            document.getElementById('li-price').value = pState.invoice?.total_cost?.toFixed(2) || '0.00';
             document.getElementById('li-name').focus();
         }
     });
@@ -581,7 +743,8 @@ window.initProductsView = function () {
         if (!item) return;
         document.getElementById('prod-name').value = item.name;
         document.getElementById('prod-qty').value = item.qty;
-        document.getElementById('prod-price').value = item.price.toFixed(2);
+        document.getElementById('prod-price').value = item.price.toFixed(2); // unit cost (read-only)
+        document.getElementById('prod-unit-price').value = item.sellingPrice ? item.sellingPrice.toFixed(2) : ''; // selling price
         // Match category dropdown — fall back to General if value not in list
         const catSelect = document.getElementById('prod-category');
         const matchingOpt = Array.from(catSelect.options).find(o => o.value === item.category || o.textContent === item.category);
@@ -592,11 +755,20 @@ window.initProductsView = function () {
     document.getElementById('prod-submit')?.addEventListener('click', async () => {
         const name = document.getElementById('prod-name').value.trim();
         const qty = parseInt(document.getElementById('prod-qty').value) || 0;
-        const price = parseFloat(document.getElementById('prod-price').value) || 0;
+        const price = parseFloat(document.getElementById('prod-price').value) || 0; // unit cost
+        const sellingPrice = parseFloat(document.getElementById('prod-unit-price').value) || 0; // selling price
         const category = document.getElementById('prod-category').value;
         const description = document.getElementById('prod-description').value.trim();
-        if (!name) { setErr('prod-name', true); return; }
-        setErr('prod-name', false);
+
+        let valid = true;
+        if (!name) { setErr('prod-name', true); valid = false; } else setErr('prod-name', false);
+        if (sellingPrice <= 0) {
+            document.getElementById('prod-unit-price').style.borderColor = '#ef4444';
+            valid = false;
+        } else {
+            document.getElementById('prod-unit-price').style.borderColor = '';
+        }
+        if (!valid) return;
 
         // Update the selected line item with any Step-4 overrides before saving
         const selIdx = parseInt(document.getElementById('prod-select')?.value);
@@ -604,6 +776,7 @@ window.initProductsView = function () {
             pState.lineItems[selIdx].name = name;
             pState.lineItems[selIdx].qty = qty;
             pState.lineItems[selIdx].price = price;
+            pState.lineItems[selIdx].sellingPrice = sellingPrice;
             pState.lineItems[selIdx].category = category;
             pState.lineItems[selIdx].description = description;
         }
@@ -647,26 +820,30 @@ window.initProductsView = function () {
         if (typeof $ !== 'undefined' && dtInstance) {
             dtInstance.rows().every(function (rowIdx) {
                 const data = this.data();
-                // data[0] is #ID, data[1] is Name, data[5] is Qty badge, data[6] is MKPrice
-                const id = data[0].replace('#', '');
+                // data[0]=id (number), data[1]=name (HTML), data[2]=category,
+                // data[3]=supplier, data[4]=invoice, data[5]=qty badge, data[6]=price
+                const id = String(data[0]);
                 const name = data[1].replace(/<\/?[^>]+(>|$)/g, "").trim();
                 const qtyText = data[5].replace(/<\/?[^>]+(>|$)/g, "").trim();
-                const priceText = data[6].replace('MK', '').trim();
-                rows.push({ id, name, category: data[2], qty: qtyText, price: parseFloat(priceText) || 0, idx: rowIdx });
+                const priceText = String(data[6]).replace('MK', '').trim();
+                const invoiceNumber = String(data[4] || '').trim();
+                rows.push({ id, name, category: data[2], qty: qtyText, price: parseFloat(priceText) || 0, invoiceNumber, idx: rowIdx });
             });
         } else {
             document.querySelectorAll('#products-tbody tr').forEach((tr, i) => {
                 const tds = tr.querySelectorAll('td');
                 if (tds.length >= 7) {
-                    const id = tds[0].textContent.replace('#', '').trim();
+                    const id = tds[0].textContent.trim();
                     const name = tds[1].textContent.trim();
                     const priceText = tds[6].textContent.replace('MK', '').trim();
+                    const invoiceNumber = tds[4].textContent.trim();
                     rows.push({
                         id,
                         name,
                         category: tds[2].textContent.trim(),
                         qty: tds[5].textContent.trim(),
                         price: parseFloat(priceText) || 0,
+                        invoiceNumber,
                         idx: i
                     });
                 }
@@ -726,9 +903,11 @@ window.initProductsView = function () {
              <span class="stag stag-i">Qty in stock: ${issueSelected.qty}</span>`;
         document.getElementById('issue-qty').value = '1';
         document.getElementById('issue-qty').max = parseInt(issueSelected.qty) || 9999;
-        document.getElementById('issue-invoice-id').value = '';
-        document.getElementById('issue-recipient').value = '';
-        document.getElementById('issue-notes').value = '';
+        // Auto-fill invoice / reference from the product's last procurement invoice
+        const invField = document.getElementById('issue-invoice-id');
+        invField.value = (issueSelected.invoiceNumber && issueSelected.invoiceNumber !== '—')
+            ? issueSelected.invoiceNumber
+            : '';
         openModal('modal-issue-details');
     });
 
@@ -753,19 +932,20 @@ window.initProductsView = function () {
         }
 
         // Log the issuance in audit log
-        window.api.logAction('Issue Product', `Issued ${qty} units of "${issueSelected.name}" (Ref: ${invoiceId})`);
+        const reason = document.getElementById('issue-reason')?.value || 'Issue';
+        window.api.logAction('Issue Product', `Issued ${qty} units of "${issueSelected.name}" (Ref: ${invoiceId}) — Reason: ${reason}`);
 
         // Persist to database
         window.api.issueProduct({
             product_id: issueSelected.id,
             quantity: qty,
             transaction_date: new Date().toISOString().split('T')[0],
-            transaction_description: `Issued to: ${document.getElementById('issue-recipient').value || 'Unknown'} - Ref: ${invoiceId}`,
+            transaction_description: `${reason} — Ref: ${invoiceId}`,
             unit_price: issueSelected.price
         });
 
         closeAll();
-        showFeedback(`Issued ${qty}× "${issueSelected.name}" — Ref: ${invoiceId}`, 'success');
+        showFeedback(`Issued ${qty}× "${issueSelected.name}" — ${reason}`, 'success');
         issueSelected = null;
     });
 

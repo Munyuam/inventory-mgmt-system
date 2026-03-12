@@ -82,3 +82,159 @@
 [2026-03-12 01:15:29] [User: admin] Action: View Navigation - User navigated to "dashboard" page.
 [2026-03-12 01:15:30] [User: admin] Action: View Load Error - Failed to load "dashboard": categoryChart.destroy is not a function
 [2026-03-12 01:15:31] [User: admin] Action: View Navigation - User navigated to "products" page.
+[2026-03-12 01:20:39] [User: System] Action: System started - Application initialized and database connected.
+[2026-03-12 01:20:45] [User: admin] Action: Login - admin logged in successfully
+[2026-03-12 01:20:46] [User: admin] Action: View Navigation - User navigated to "dashboard" page.
+[2026-03-12 01:20:47] [User: admin] Action: View Load Error - Failed to load "dashboard": categoryChart.destroy is not a function
+[2026-03-12 01:20:49] [User: admin] Action: View Navigation - User navigated to "products" page.
+[2026-03-12 01:24:58] [User: admin] Action: Procurement Saved - admin processed invoice inv-2026-100 from azam limited with 3 items.
+[2026-03-12 01:31:14] [User: admin] Action: View Navigation - User navigated to "dashboard" page.
+[2026-03-12 01:31:15] [User: admin] Action: View Load Error - Failed to load "dashboard": categoryChart.destroy is not a function
+[2026-03-12 01:31:17] [User: admin] Action: View Navigation - User navigated to "products" page.
+[2026-03-12 01:33:09] [User: System] Action: System started - Application initialized and database connected.
+[2026-03-12 01:33:16] [User: admin] Action: Login - admin logged in successfully
+[2026-03-12 01:33:17] [User: admin] Action: View Navigation - User navigated to "dashboard" page.
+[2026-03-12 01:33:17] [User: admin] Action: View Load Error - Failed to load "dashboard": categoryChart.destroy is not a function
+[2026-03-12 01:33:20] [User: admin] Action: View Navigation - User navigated to "products" page.
+[2026-03-12 01:34:11] [User: admin] Action: View Navigation - User navigated to "dashboard" page.
+[2026-03-12 01:34:12] [User: admin] Action: View Load Error - Failed to load "dashboard": categoryChart.destroy is not a function
+[2026-03-12 01:34:13] [User: admin] Action: View Navigation - User navigated to "products" page.
+[2026-03-12 01:49:06] [User: admin] Action: View Navigation - User navigated to "settings" page.
+[2026-03-12 02:01:11] [User: System] Action: System started - Application initialized and database connected.
+[2026-03-12 02:01:19] [User: admin] Action: Login - admin logged in successfully
+[2026-03-12 02:01:20] [User: admin] Action: View Navigation - User navigated to "dashboard" page.
+[2026-03-12 02:01:21] [User: admin] Action: View Load Error - Failed to load "dashboard": categoryChart.destroy is not a function
+[2026-03-12 02:01:22] [User: admin] Action: View Navigation - User navigated to "products" page.
+[2026-03-12 02:07:56] [User: admin] Action: View Navigation - User navigated to "settings" page.
+[2026-03-12 02:08:01] [User: admin] Action: View Navigation - User navigated to "reports" page.
+[2026-03-12 02:08:04] [User: admin] Action: View Navigation - User navigated to "summary" page.
+[2026-03-12 02:08:06] [User: admin] Action: View Navigation - User navigated to "activity" page.
+[2026-03-12 02:08:08] [User: admin] Action: View Navigation - User navigated to "products" page.
+[2026-03-12 02:08:20] [User: admin] Action: View Navigation - User navigated to "dashboard" page.
+[2026-03-12 02:08:20] [User: admin] Action: View Load Error - Failed to load "dashboard": categoryChart.destroy is not a function
+[2026-03-12 02:08:24] [User: admin] Action: View Navigation - User navigated to "products" page.
+[2026-03-12 02:09:26] [User: System] Action: System started - Application initialized and database connected.
+[2026-03-12 02:09:40] [User: System] Action: System started - Application initialized and database connected.
+[2026-03-12 02:09:46] [User: admin] Action: Login - admin logged in successfully
+[2026-03-12 02:09:47] [User: admin] Action: View Navigation - User navigated to "dashboard" page.
+[2026-03-12 02:09:47] [User: admin] Action: View Load Error - Failed to load "dashboard": categoryChart.destroy is not a function
+[2026-03-12 02:09:48] [User: admin] Action: View Navigation - User navigated to "products" page.
+[2026-03-12 02:12:44] [User: admin] Action: View Navigation - User navigated to "dashboard" page.
+[2026-03-12 02:12:45] [User: admin] Action: View Load Error - Failed to load "dashboard": categoryChart.destroy is not a function
+[2026-03-12 02:12:47] [User: admin] Action: View Navigation - User navigated to "activity" page.
+[2026-03-12 02:12:49] [User: admin] Action: View Navigation - User navigated to "products" page.
+[2026-03-12 02:13:54] [User: admin] Action: View Navigation - User navigated to "dashboard" page.
+[2026-03-12 02:13:55] [User: admin] Action: View Load Error - Failed to load "dashboard": categoryChart.destroy is not a function
+[2026-03-12 02:13:57] [User: admin] Action: View Navigation - User navigated to "products" page.
+[2026-03-12 02:14:40] [User: admin] Action: View Navigation - User navigated to "dashboard" page.
+[2026-03-12 02:14:41] [User: admin] Action: View Load Error - Failed to load "dashboard": categoryChart.destroy is not a function
+[2026-03-12 02:14:42] [User: admin] Action: View Navigation - User navigated to "products" page.
+[2026-03-12 02:18:16] [User: admin] Action: View Navigation - User navigated to "dashboard" page.
+[2026-03-12 02:18:17] [User: admin] Action: View Load Error - Failed to load "dashboard": categoryChart.destroy is not a function
+[2026-03-12 02:18:19] [User: admin] Action: View Navigation - User navigated to "products" page.
+[2026-03-12 02:20:57] [User: admin] Action: View Navigation - User navigated to "dashboard" page.
+[2026-03-12 02:20:58] [User: admin] Action: View Load Error - Failed to load "dashboard": categoryChart.destroy is not a function
+[2026-03-12 02:21:00] [User: admin] Action: View Navigation - User navigated to "activity" page.
+[2026-03-12 02:21:01] [User: admin] Action: View Navigation - User navigated to "products" page.
+[2026-03-12 02:23:18] [User: admin] Action: Procurement Saved - admin processed invoice INV-800-900 from salima sugar with 1 items.
+[2026-03-12 02:31:04] [User: admin] Action: View Navigation - User navigated to "dashboard" page.
+[2026-03-12 02:31:05] [User: admin] Action: View Load Error - Failed to load "dashboard": categoryChart.destroy is not a function
+[2026-03-12 02:31:07] [User: admin] Action: View Navigation - User navigated to "products" page.
+[2026-03-12 02:34:20] [User: admin] Action: Procurement Saved - admin processed invoice INV-200-400 from sd with 1 items.
+[2026-03-12 02:35:02] [User: admin] Action: View Navigation - User navigated to "dashboard" page.
+[2026-03-12 02:35:03] [User: admin] Action: View Load Error - Failed to load "dashboard": categoryChart.destroy is not a function
+[2026-03-12 02:35:04] [User: admin] Action: View Navigation - User navigated to "products" page.
+[2026-03-12 02:35:40] [User: admin] Action: Procurement Saved - admin processed invoice INV-200-400 from sdds with 1 items.
+[2026-03-12 02:37:23] [User: admin] Action: View Navigation - User navigated to "dashboard" page.
+[2026-03-12 02:37:24] [User: admin] Action: View Load Error - Failed to load "dashboard": categoryChart.destroy is not a function
+[2026-03-12 02:37:26] [User: admin] Action: View Navigation - User navigated to "products" page.
+[2026-03-12 02:38:12] [User: admin] Action: Procurement Saved - admin processed invoice INV-200-400 from asas with 1 items.
+[2026-03-12 02:39:20] [User: System] Action: System started - Application initialized and database connected.
+[2026-03-12 02:39:26] [User: admin] Action: Login - admin logged in successfully
+[2026-03-12 02:39:27] [User: admin] Action: View Navigation - User navigated to "dashboard" page.
+[2026-03-12 02:39:28] [User: admin] Action: View Load Error - Failed to load "dashboard": categoryChart.destroy is not a function
+[2026-03-12 02:39:28] [User: admin] Action: View Navigation - User navigated to "products" page.
+[2026-03-12 02:40:14] [User: admin] Action: Procurement Error - Failed to save invoice INV-200-200. Error: Too few parameter values were provided
+[2026-03-12 02:40:15] [User: admin] Action: Procurement Error - Failed to save invoice INV-200-200. Error: Too few parameter values were provided
+[2026-03-12 02:40:17] [User: admin] Action: Procurement Error - Failed to save invoice INV-200-200. Error: Too few parameter values were provided
+[2026-03-12 02:40:19] [User: admin] Action: Procurement Error - Failed to save invoice INV-200-200. Error: Too few parameter values were provided
+[2026-03-12 02:40:24] [User: admin] Action: Procurement Error - Failed to save invoice INV-200-200. Error: Too few parameter values were provided
+[2026-03-12 02:40:24] [User: admin] Action: Procurement Error - Failed to save invoice INV-200-200. Error: Too few parameter values were provided
+[2026-03-12 02:44:44] [User: System] Action: System started - Application initialized and database connected.
+[2026-03-12 02:44:50] [User: admin] Action: Login - admin logged in successfully
+[2026-03-12 02:44:51] [User: admin] Action: View Navigation - User navigated to "dashboard" page.
+[2026-03-12 02:44:52] [User: admin] Action: View Load Error - Failed to load "dashboard": categoryChart.destroy is not a function
+[2026-03-12 02:44:53] [User: admin] Action: View Navigation - User navigated to "products" page.
+[2026-03-12 02:45:43] [User: admin] Action: Procurement Saved - admin processed invoice INV-400-500 from sdds with 1 items.
+[2026-03-12 02:50:12] [User: System] Action: System started - Application initialized and database connected.
+[2026-03-12 02:50:19] [User: admin] Action: Login - admin logged in successfully
+[2026-03-12 02:50:20] [User: admin] Action: View Navigation - User navigated to "dashboard" page.
+[2026-03-12 02:50:20] [User: admin] Action: View Load Error - Failed to load "dashboard": categoryChart.destroy is not a function
+[2026-03-12 02:50:22] [User: admin] Action: View Navigation - User navigated to "products" page.
+[2026-03-12 02:51:33] [User: admin] Action: Procurement Saved - admin processed invoice INV-900-800 from sa with 1 items.
+[2026-03-12 02:57:14] [User: admin] Action: View Navigation - User navigated to "dashboard" page.
+[2026-03-12 02:57:15] [User: admin] Action: View Load Error - Failed to load "dashboard": categoryChart.destroy is not a function
+[2026-03-12 02:57:16] [User: admin] Action: View Navigation - User navigated to "products" page.
+[2026-03-12 03:01:13] [User: System] Action: System started - Application initialized and database connected.
+[2026-03-12 03:01:26] [User: System] Action: System started - Application initialized and database connected.
+[2026-03-12 03:01:37] [User: admin] Action: Login - admin logged in successfully
+[2026-03-12 03:01:38] [User: admin] Action: View Navigation - User navigated to "dashboard" page.
+[2026-03-12 03:01:38] [User: admin] Action: View Load Error - Failed to load "dashboard": categoryChart.destroy is not a function
+[2026-03-12 03:01:40] [User: admin] Action: View Navigation - User navigated to "products" page.
+[2026-03-12 03:04:36] [User: admin] Action: View Navigation - User navigated to "dashboard" page.
+[2026-03-12 03:04:37] [User: admin] Action: View Load Error - Failed to load "dashboard": categoryChart.destroy is not a function
+[2026-03-12 03:04:38] [User: admin] Action: View Navigation - User navigated to "products" page.
+[2026-03-12 03:04:59] [User: admin] Action: Update Product - admin updated product: peanut butter (ID: 1)
+[2026-03-12 03:05:03] [User: admin] Action: View Navigation - User navigated to "dashboard" page.
+[2026-03-12 03:05:04] [User: admin] Action: View Load Error - Failed to load "dashboard": categoryChart.destroy is not a function
+[2026-03-12 03:05:05] [User: admin] Action: View Navigation - User navigated to "products" page.
+[2026-03-12 03:05:15] [User: admin] Action: Update Product - admin updated product: peanut butter (ID: 1)
+[2026-03-12 03:05:19] [User: admin] Action: View Navigation - User navigated to "dashboard" page.
+[2026-03-12 03:05:19] [User: admin] Action: View Load Error - Failed to load "dashboard": categoryChart.destroy is not a function
+[2026-03-12 03:05:21] [User: admin] Action: View Navigation - User navigated to "products" page.
+[2026-03-12 03:07:26] [User: admin] Action: Update Product - admin updated product: soap (ID: 2)
+[2026-03-12 03:07:39] [User: admin] Action: Update Product - admin updated product: azam energy drink (ID: 3)
+[2026-03-12 03:07:58] [User: admin] Action: Update Product - admin updated product: we (ID: 6)
+[2026-03-12 03:08:07] [User: admin] Action: Update Product - admin updated product: SSD (ID: 7)
+[2026-03-12 03:08:46] [User: admin] Action: Update Product - admin updated product: jiggies (ID: 6)
+[2026-03-12 03:09:22] [User: admin] Action: View Navigation - User navigated to "dashboard" page.
+[2026-03-12 03:09:23] [User: admin] Action: View Load Error - Failed to load "dashboard": categoryChart.destroy is not a function
+[2026-03-12 03:09:24] [User: admin] Action: View Navigation - User navigated to "products" page.
+[2026-03-12 03:10:12] [User: admin] Action: View Navigation - User navigated to "dashboard" page.
+[2026-03-12 03:10:13] [User: admin] Action: View Load Error - Failed to load "dashboard": categoryChart.destroy is not a function
+[2026-03-12 03:10:14] [User: admin] Action: View Navigation - User navigated to "products" page.
+[2026-03-12 03:10:30] [User: admin] Action: View Navigation - User navigated to "dashboard" page.
+[2026-03-12 03:10:31] [User: admin] Action: View Load Error - Failed to load "dashboard": categoryChart.destroy is not a function
+[2026-03-12 03:10:31] [User: admin] Action: View Navigation - User navigated to "products" page.
+[2026-03-12 03:11:39] [User: admin] Action: Update Product - admin updated product: sugar (ID: 9)
+[2026-03-12 03:12:03] [User: admin] Action: Update Product - admin updated product: chambo (ID: 9)
+[2026-03-12 03:12:15] [User: admin] Action: Update Product - admin updated product: chambo (ID: 9)
+[2026-03-12 03:12:44] [User: admin] Action: Update Product - admin updated product: froze drink (ID: 7)
+[2026-03-12 03:13:15] [User: admin] Action: Update Product - admin updated product: fish cane (ID: 10)
+[2026-03-12 03:14:03] [User: admin] Action: View Navigation - User navigated to "settings" page.
+[2026-03-12 03:15:40] [User: admin] Action: View Navigation - User navigated to "products" page.
+[2026-03-12 03:22:29] [User: System] Action: System started - Application initialized and database connected.
+[2026-03-12 03:22:35] [User: admin] Action: Login - admin logged in successfully
+[2026-03-12 03:22:36] [User: admin] Action: View Navigation - User navigated to "dashboard" page.
+[2026-03-12 03:22:37] [User: admin] Action: View Load Error - Failed to load "dashboard": categoryChart.destroy is not a function
+[2026-03-12 03:22:39] [User: admin] Action: View Navigation - User navigated to "settings" page.
+[2026-03-12 03:22:50] [User: admin1] Action: Update Profile - admin1 updated their profile details.
+[2026-03-12 03:23:04] [User: admin] Action: Update Profile - admin updated their profile details.
+[2026-03-12 03:23:15] [User: admin] Action: Change Password - admin changed their password.
+[2026-03-12 03:23:23] [User: admin] Action: Logout - admin logged out
+[2026-03-12 03:23:29] [User: admin] Action: Login Failed - Failed login attempt for user: admin. Reason: Invalid password
+[2026-03-12 03:23:32] [User: admin] Action: Login - admin logged in successfully
+[2026-03-12 03:23:32] [User: admin] Action: View Navigation - User navigated to "dashboard" page.
+[2026-03-12 03:23:33] [User: admin] Action: View Load Error - Failed to load "dashboard": categoryChart.destroy is not a function
+[2026-03-12 03:23:35] [User: admin] Action: View Navigation - User navigated to "settings" page.
+[2026-03-12 03:24:01] [User: admin] Action: Change Password - admin changed their password.
+[2026-03-12 03:24:21] [User: admin] Action: View Navigation - User navigated to "products" page.
+[2026-03-12 03:24:34] [User: admin] Action: View Navigation - User navigated to "dashboard" page.
+[2026-03-12 03:24:35] [User: admin] Action: View Load Error - Failed to load "dashboard": categoryChart.destroy is not a function
+[2026-03-12 03:24:36] [User: admin] Action: View Navigation - User navigated to "products" page.
+[2026-03-12 03:25:03] [User: admin] Action: View Navigation - User navigated to "dashboard" page.
+[2026-03-12 03:25:04] [User: admin] Action: View Load Error - Failed to load "dashboard": categoryChart.destroy is not a function
+[2026-03-12 03:25:05] [User: admin] Action: View Navigation - User navigated to "products" page.
+[2026-03-12 03:25:06] [User: admin] Action: View Navigation - User navigated to "dashboard" page.
+[2026-03-12 03:25:07] [User: admin] Action: View Load Error - Failed to load "dashboard": categoryChart.destroy is not a function
+[2026-03-12 03:25:09] [User: admin] Action: View Navigation - User navigated to "products" page.

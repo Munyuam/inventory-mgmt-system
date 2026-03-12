@@ -88,7 +88,8 @@ async function getProducts(userDataPath) {
       COALESCE(SUM(CASE WHEN t.transaction_type = 'Procurement' THEN t.quantity ELSE -t.quantity END), 0) AS quantity,
       COALESCE(SUM(CASE WHEN t.transaction_type = 'Issue'       THEN t.quantity ELSE 0           END), 0) AS issued_count,
       s.supplier_name,
-      inv.invoice_number
+      inv.invoice_number,
+      ii.unit_cost
     FROM products p
     LEFT JOIN transactions t ON p.product_id = t.product_id
     -- Get the most recent invoice item for this product
@@ -180,20 +181,22 @@ async function saveFullProcurement(userDataPath, data) {
     let itemIdx = 0;
     for (const item of lineItems) {
       itemIdx++;
-      console.log(`[Step 3.${itemIdx}] Processing Item: "${item.name}"`);
+      console.log(`[Step 3.${itemIdx}] Processing Item: "${item.name}", full payload:`, JSON.stringify(item));
 
       // Update/Insert Products
       let productId;
       const existingProduct = db.prepare('SELECT product_id FROM products WHERE product_name = ?').get(item.name);
       if (existingProduct) {
         productId = existingProduct.product_id;
-        console.log(`[Step 3.${itemIdx}] Updating existing product: ${item.name} (ID: ${productId})`);
+        console.log(`[Step 3.${itemIdx}] Updating existing product: ${item.name} (ID: ${productId}) selling price: ${item.sellingPrice} cost price: ${item.price}`);
         db.prepare('UPDATE products SET unit_price = ?, product_category = ?, product_description = ? WHERE product_id = ?').run(
-          item.price, item.category || 'General', item.description || null, productId
+          item.sellingPrice || item.sellingPrice, item.category || 'General', item.description || null, productId
         );
       } else {
+        console.log(`[Step 3.${itemIdx}] Creating new product: ${item.name} (ID: ${productId}) selling price: ${item.sellingPrice} cost price: ${item.price}`);
+        console.log(`selling price: ${item.sellingPrice} cost price: ${item.price}`);
         const prodRes = db.prepare('INSERT INTO products (product_name, product_description, unit_price, product_category) VALUES (?, ?, ?, ?)').run(
-          item.name, item.description || null, item.price, item.category || 'General'
+          item.name, item.description, item.sellingPrice, item.category || 'General'
         );
         productId = prodRes.lastInsertRowid;
         console.log(`[Step 3.${itemIdx}] Created new product: ${item.name} (ID: ${productId})`);
@@ -251,14 +254,78 @@ async function issueProduct(userDataPath, data) {
   return stmt.run(product_id, transaction_date, 'Issue', transaction_description || 'Stock Issued', quantity, unit_price);
 }
 
+function updateProduct(userDataPath, data) {
+  if (!db) initDb(userDataPath);
+  const { product_id, product_name, product_category, unit_price, product_description } = data;
+  try {
+    const stmt = db.prepare(`
+      UPDATE products 
+      SET product_name = ?, product_category = ?, unit_price = ?, product_description = ?
+      WHERE product_id = ?
+    `);
+    const res = stmt.run(product_name, product_category, unit_price, product_description || null, product_id);
+    if (res.changes === 0) return { success: false, error: 'Product not found' };
+    return { success: true };
+  } catch (err) {
+    return { success: false, error: err.message };
+  }
+}
+
+// --- User Management Logic ---
+
+async function updateUserProfile(userDataPath, userId, username, email) {
+  if (!db) initDb(userDataPath);
+  try {
+    // 1. Check for Username collision
+    const existingUser = db.prepare('SELECT id FROM users WHERE username = ? AND id != ?').get(username, userId);
+    if (existingUser) return { success: false, error: 'Username is already taken by another account.' };
+
+    // 2. Check for Email collision
+    const existingEmail = db.prepare('SELECT id FROM users WHERE email = ? AND id != ?').get(email, userId);
+    if (existingEmail) return { success: false, error: 'Email address is already in use by another account.' };
+
+    // 3. Perform update
+    const stmt = db.prepare(`UPDATE users SET username = ?, email = ? WHERE id = ?`);
+    const res = stmt.run(username, email, userId);
+
+    if (res.changes === 0) return { success: false, error: 'User not found.' };
+    return { success: true };
+  } catch (err) {
+    return { success: false, error: 'Failed to update profile: ' + err.message };
+  }
+}
+
+async function changeUserPassword(userDataPath, userId, currentPassword, newPassword) {
+  if (!db) initDb(userDataPath);
+  try {
+    const user = db.prepare('SELECT password FROM users WHERE id = ?').get(userId);
+    if (!user) return { success: false, error: 'User not found.' };
+
+    const match = await bcrypt.compare(currentPassword, user.password);
+    if (!match) return { success: false, error: 'Incorrect current password.' };
+
+    const hash = await bcrypt.hash(newPassword, 10);
+    const stmt = db.prepare(`UPDATE users SET password = ? WHERE id = ?`);
+    const res = stmt.run(hash, userId);
+
+    if (res.changes === 0) return { success: false, error: 'Failed to update password.' };
+    return { success: true };
+  } catch (err) {
+    return { success: false, error: 'Failed to change password: ' + err.message };
+  }
+}
+
 module.exports = {
   initDb,
   // --- Products Logic ---
   getProducts,
   addProduct,
   issueProduct,
+  updateProduct,
   saveFullProcurement,
   // --- Auth Logic ---
   registerUser,
-  authenticateUser
+  authenticateUser,
+  updateUserProfile,
+  changeUserPassword
 };
