@@ -7,4 +7,7 @@ contextBridge.exposeInMainWorld('api', {
     signup: (userData) => ipcRenderer.invoke('auth-signup', userData),
     getCurrentUser: () => ipcRenderer.invoke('get-current-user'),
     logout: () => ipcRenderer.invoke('logout'),
+    saveProcurement: (data) => ipcRenderer.invoke('save-procurement', data),
+    logAction: (action, details) => ipcRenderer.invoke('emit-log', { action, details }),
+    issueProduct: (data) => ipcRenderer.invoke('issue-product', data)
 })

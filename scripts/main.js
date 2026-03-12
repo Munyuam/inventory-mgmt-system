@@ -33,6 +33,8 @@ app.whenReady().then(() => {
         if (result.success) {
             currentUser = { username, email };
             logAction(username, 'Account Created', `${username} registered with email: ${email}`);
+        } else {
+            logAction('Guest', 'Account Creation Failed', `Attempted username: ${username}, Error: ${result.error}`);
         }
         return result;
     });
@@ -42,6 +44,8 @@ app.whenReady().then(() => {
         if (result.success) {
             currentUser = result.user;
             logAction(username, 'Login', `${username} logged in successfully`);
+        } else {
+            logAction(username || 'Guest', 'Login Failed', `Failed login attempt for user: ${username || 'Unknown'}. Reason: ${result.error}`);
         }
         return result;
     });
@@ -62,11 +66,38 @@ app.whenReady().then(() => {
 
     ipcMain.handle('add-product', (event, item) => {
         const username = currentUser ? currentUser.username : 'Guest';
+        // Map old schema parameters to new logic if needed, 
+        // but transitioning to saveFullProcurement is preferred.
         const result = db.addProduct(userDataPath, item.name, item.quantity, item.price, item.category);
         if (result && result.changes > 0) {
-            logAction(username, 'Add Product', `${username} added product: ${item.name} (Qty: ${item.quantity}, Price: ${item.price}, Category: ${item.category})`);
+            logAction(username, 'Add Product', `${username} added product: ${item.name} (Qty: ${item.quantity}, Price: MK${item.price}, Category: ${item.category})`);
         }
         return result;
+    });
+
+    ipcMain.handle('save-procurement', async (event, data) => {
+        const username = currentUser ? currentUser.username : 'Guest';
+        const userId = currentUser ? currentUser.id : 1;
+
+        // Inject user_id into data for the database layer
+        const enrichedData = { ...data, user_id: userId };
+
+        const result = await db.saveFullProcurement(userDataPath, enrichedData);
+        if (result.success) {
+            logAction(username, 'Procurement Saved', `${username} processed invoice ${data.invoice.number} from ${data.supplier.name} with ${data.lineItems.length} items.`);
+        } else {
+            logAction(username, 'Procurement Error', `Failed to save invoice ${data.invoice.number}. Error: ${result.error}`);
+        }
+        return result;
+    });
+
+    ipcMain.handle('emit-log', (event, { action, details }) => {
+        const username = currentUser ? currentUser.username : 'Guest';
+        logAction(username, action, details);
+    });
+
+    ipcMain.handle('issue-product', async (event, data) => {
+        return db.issueProduct(userDataPath, data);
     });
 
     createWindow()

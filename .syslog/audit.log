@@ -36,3 +36,49 @@
 [2026-03-11 11:54:19] [User: mwiza] Action: Login - mwiza logged in successfully
 [2026-03-11 11:59:54] [User: mwiza] Action: Logout - mwiza logged out
 [2026-03-11 12:00:03] [User: admin] Action: Login - admin logged in successfully
+[2026-03-11 12:50:16] [User: System] Action: System started - Application initialized and database connected.
+[2026-03-11 12:50:24] [User: admin] Action: Login - admin logged in successfully
+[2026-03-11 12:54:54] [User: System] Action: System started - Application initialized and database connected.
+[2026-03-11 12:55:04] [User: admin] Action: Login - admin logged in successfully
+[2026-03-11 13:07:53] [User: System] Action: System started - Application initialized and database connected.
+[2026-03-11 13:08:00] [User: admin] Action: Login - admin logged in successfully
+[2026-03-11 13:19:57] [User: System] Action: System started - Application initialized and database connected.
+[2026-03-11 13:20:06] [User: admin] Action: Login - admin logged in successfully
+[2026-03-11 13:50:38] [User: System] Action: System started - Application initialized and database connected.
+[2026-03-11 13:50:49] [User: admin] Action: Login - admin logged in successfully
+[2026-03-12 00:19:26] [User: System] Action: System started - Application initialized and database connected.
+[2026-03-12 00:19:39] [User: mwiza] Action: Login - mwiza logged in successfully
+[2026-03-12 00:19:40] [User: mwiza] Action: View Navigation - User navigated to "dashboard" page.
+[2026-03-12 00:19:40] [User: mwiza] Action: View Load Error - Failed to load "dashboard": categoryChart.destroy is not a function
+[2026-03-12 00:19:42] [User: mwiza] Action: View Navigation - User navigated to "products" page.
+[2026-03-12 00:20:42] [User: mwiza] Action: Procurement Error - Failed to save invoice inv-2026-900. Error: FOREIGN KEY constraint failed
+[2026-03-12 00:21:23] [User: mwiza] Action: View Navigation - User navigated to "dashboard" page.
+[2026-03-12 00:21:23] [User: mwiza] Action: View Load Error - Failed to load "dashboard": categoryChart.destroy is not a function
+[2026-03-12 00:21:25] [User: mwiza] Action: View Navigation - User navigated to "products" page.
+[2026-03-12 00:22:17] [User: mwiza] Action: Procurement Error - Failed to save invoice inv-2026-900. Error: FOREIGN KEY constraint failed
+[2026-03-12 00:24:30] [User: System] Action: System started - Application initialized and database connected.
+[2026-03-12 00:24:36] [User: admin] Action: Login - admin logged in successfully
+[2026-03-12 00:24:36] [User: admin] Action: View Navigation - User navigated to "dashboard" page.
+[2026-03-12 00:24:37] [User: admin] Action: View Load Error - Failed to load "dashboard": categoryChart.destroy is not a function
+[2026-03-12 00:24:39] [User: admin] Action: View Navigation - User navigated to "products" page.
+[2026-03-12 00:25:43] [User: admin] Action: Procurement Error - Failed to save invoice inv-2026-900. Error: FOREIGN KEY constraint failed
+[2026-03-12 01:08:46] [User: System] Action: System started - Application initialized and database connected.
+[2026-03-12 01:09:10] [User: admin] Action: Account Created - admin registered with email: manyumasichinga66@gmail.com
+[2026-03-12 01:09:11] [User: admin] Action: View Navigation - User navigated to "dashboard" page.
+[2026-03-12 01:09:11] [User: admin] Action: View Load Error - Failed to load "dashboard": categoryChart.destroy is not a function
+[2026-03-12 01:09:14] [User: admin] Action: View Navigation - User navigated to "products" page.
+[2026-03-12 01:10:38] [User: admin] Action: Procurement Saved - admin processed invoice inv-2026-400 from lab processors with 1 items.
+[2026-03-12 01:10:48] [User: admin] Action: View Navigation - User navigated to "dashboard" page.
+[2026-03-12 01:10:49] [User: admin] Action: View Load Error - Failed to load "dashboard": categoryChart.destroy is not a function
+[2026-03-12 01:10:51] [User: admin] Action: View Navigation - User navigated to "products" page.
+[2026-03-12 01:14:58] [User: admin] Action: View Navigation - User navigated to "dashboard" page.
+[2026-03-12 01:14:58] [User: admin] Action: View Load Error - Failed to load "dashboard": categoryChart.destroy is not a function
+[2026-03-12 01:15:00] [User: admin] Action: View Navigation - User navigated to "products" page.
+[2026-03-12 01:15:02] [User: admin] Action: View Navigation - User navigated to "dashboard" page.
+[2026-03-12 01:15:02] [User: admin] Action: View Load Error - Failed to load "dashboard": categoryChart.destroy is not a function
+[2026-03-12 01:15:04] [User: admin] Action: View Navigation - User navigated to "products" page.
+[2026-03-12 01:15:22] [User: System] Action: System started - Application initialized and database connected.
+[2026-03-12 01:15:28] [User: admin] Action: Login - admin logged in successfully
+[2026-03-12 01:15:29] [User: admin] Action: View Navigation - User navigated to "dashboard" page.
+[2026-03-12 01:15:30] [User: admin] Action: View Load Error - Failed to load "dashboard": categoryChart.destroy is not a function
+[2026-03-12 01:15:31] [User: admin] Action: View Navigation - User navigated to "products" page.

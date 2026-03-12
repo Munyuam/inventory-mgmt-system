@@ -1,52 +1,72 @@
-let categoryChart = null;
-let issuedChart = null;
-
 const loadProducts = async () => {
     const products = await window.api.getProducts();
+
+    // --- Update Dashboard Stats (if on dashboard) ---
     const listElement = document.getElementById('inventoryList');
     if (listElement) listElement.innerHTML = '';
 
     let totalQuantity = 0;
     let lowStockCount = 0;
     let totalValue = 0;
-
-    // Aggregation for category chart
     const categories = {};
 
     products.forEach(item => {
         totalQuantity += item.quantity;
-        totalValue += (item.price * item.quantity);
-        if (item.quantity < 10) {
-            lowStockCount++;
-        }
+        totalValue += (item.unit_price * item.quantity);
+        if (item.quantity < 10) lowStockCount++;
 
-        const cat = item.category || 'General';
+        const cat = item.product_category || 'General';
         categories[cat] = (categories[cat] || 0) + item.quantity;
 
         if (listElement) {
             const row = document.createElement('tr');
             row.innerHTML = `
-                <td>#${item.id}</td>
-                <td>${item.name}</td>
+                <td>#${item.product_id}</td>
+                <td>${item.product_name}</td>
                 <td style="color: var(--text-muted); font-size: 0.8rem;">${cat}</td>
-                <td><span class="badge ${item.quantity < 10 ? 'badge-warning' : 'badge-success'}">${item.quantity}</span></td>
-                <td>MK${item.price.toFixed(2)}</td>
+                <td><span class="badge ${item.quantity < 10 ? 'badge-low' : 'badge-ok'}">${item.quantity}</span></td>
+                <td>MK${item.unit_price.toFixed(2)}</td>
             `;
             listElement.appendChild(row);
         }
     });
 
-    // Ranking "Most Issued" Products
-    const mostIssued = [...products]
-        .sort((a, b) => b.issued_count - a.issued_count)
-        .slice(0, 5);
-
-    // Update Dashboard Stats
     if (document.getElementById('stat-total')) document.getElementById('stat-total').textContent = products.length;
     if (document.getElementById('stat-low')) document.getElementById('stat-low').textContent = lowStockCount;
-    if (document.getElementById('stat-value')) document.getElementById('stat-value').textContent = `$${totalValue.toFixed(2)}`;
+    if (document.getElementById('stat-value')) document.getElementById('stat-value').textContent = `MK${totalValue.toFixed(2)}`;
 
+    // Ranking "Most Issued" Products
+    const mostIssued = [...products].sort((a, b) => b.issued_count - a.issued_count).slice(0, 5);
     updateCharts(categories, mostIssued);
+
+    // --- Update Products Table (if on products view) ---
+    const productsTbody = document.getElementById('products-tbody');
+    if (productsTbody) {
+        // We use window.refreshProductsTable if initProductsView has set it up with DataTables
+        if (window.refreshProductsTableData) {
+            window.refreshProductsTableData(products);
+        } else {
+            // fallback: manual render
+            productsTbody.innerHTML = '';
+            if (products.length === 0) {
+                productsTbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:40px; color:var(--text-muted);">No products found.</td></tr>';
+                return;
+            }
+            products.forEach((p, i) => {
+                const qtyBadge = `<span class="badge ${p.quantity < 10 ? 'badge-low' : 'badge-ok'}">${p.quantity}</span>`;
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${p.product_id}</td>
+                    <td><strong>${p.product_name}</strong></td>
+                    <td>${p.product_category || 'General'}</td>
+                    <td>${p.supplier_name || '—'}</td>
+                    <td>${p.invoice_number || '—'}</td>
+                    <td>${qtyBadge}</td>
+                    <td>MK${parseFloat(p.unit_price).toFixed(2)}</td>`;
+                productsTbody.appendChild(row);
+            });
+        }
+    }
 };
 
 const updateCharts = (categoryData, mostIssuedProducts) => {
@@ -151,12 +171,15 @@ const handleAddProduct = async () => {
 
         if (result && result.changes > 0) {
             showProductFeedback(`Successfully added "${name}"`, 'success');
+            // Log manually if not using saveFullProcurement workflow
+            window.api.logAction('Manual Product Add', `Product "${name}" added manually via simple form.`);
             nameInput.value = '';
             qtyInput.value = '0';
             priceInput.value = '0.00';
             await loadProducts();
         } else {
             showProductFeedback('Failed to add product. Please try again.', 'error');
+            window.api.logAction('Add Product Failed', `Attempted to add "${name}" but database update returned no changes.`);
         }
     } catch (error) {
         console.error('Add Product Error:', error);
@@ -228,6 +251,9 @@ const loadView = async (viewName) => {
     const container = document.getElementById('dynamic-content');
     if (!loader || !container) return;
 
+    // Log view navigation
+    window.api.logAction('View Navigation', `User navigated to "${viewName}" page.`);
+
     // Show loader
     loader.classList.add('active');
     container.style.opacity = '0.5';
@@ -252,10 +278,12 @@ const loadView = async (viewName) => {
             if (typeof window.initProductsView === 'function') {
                 window.initProductsView();
             }
+            await loadProducts();
         }
         // Other views are self-contained
     } catch (error) {
         console.error('Error loading view:', error);
+        window.api.logAction('View Load Error', `Failed to load "${viewName}": ${error.message}`);
         container.innerHTML = `<div class="error-msg">Failed to load content. Please try again.</div>`;
     } finally {
         loader.classList.remove('active');
@@ -387,38 +415,6 @@ window.initProductsView = function () {
     }
     ensureDataTable();
 
-    /* ----- Add row to DataTable ----- */
-    function addTableRow(name, category, supplier, invoice, qty, price) {
-        const qtyBadge = `<span class="badge ${qty < 10 ? 'badge-low' : 'badge-ok'}">${qty}</span>`;
-        if (typeof $ !== 'undefined' && dtInstance) {
-            dtInstance.row.add([
-                dtInstance.rows().count() + 1,
-                `<strong>${name}</strong>`,
-                category,
-                supplier,
-                invoice,
-                qtyBadge,
-                `$${parseFloat(price).toFixed(2)}`
-            ]).draw();
-        } else {
-            // fallback: plain table row
-            const tbody = document.getElementById('products-tbody');
-            if (!tbody) return;
-            const placeholder = tbody.querySelector('td[colspan]');
-            if (placeholder) placeholder.closest('tr').remove();
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td>${tbody.rows.length + 1}</td>
-                <td><strong>${name}</strong></td>
-                <td>${category}</td>
-                <td>${supplier}</td>
-                <td>${invoice}</td>
-                <td>${qtyBadge}</td>
-                <td>$${parseFloat(price).toFixed(2)}</td>`;
-            tbody.appendChild(row);
-        }
-    }
-
     /* ===================== STEP 1: SUPPLIER ===================== */
     document.getElementById('open-supplier-btn')?.addEventListener('click', () => {
         openModal('modal-supplier');
@@ -430,10 +426,8 @@ window.initProductsView = function () {
         setErr('sup-name', false);
         pState.supplier = {
             name,
-            contact: document.getElementById('sup-contact')?.value.trim() || '',
             phone: document.getElementById('sup-phone')?.value.trim() || '',
-            email: document.getElementById('sup-email')?.value.trim() || '',
-            address: document.getElementById('sup-address')?.value.trim() || '',
+            email: document.getElementById('sup-email')?.value.trim() || ''
         };
         // populate tag in step 2
         document.getElementById('inv-stags').innerHTML = stag('stag-s', '✓ ' + pState.supplier.name);
@@ -441,6 +435,26 @@ window.initProductsView = function () {
         document.getElementById('inv-date').value = new Date().toISOString().split('T')[0];
         openModal('modal-invoice');
     });
+
+    // Bridge for main loadProducts to refresh the DataTables table
+    window.refreshProductsTableData = (products) => {
+        if (typeof $ !== 'undefined' && dtInstance) {
+            dtInstance.clear();
+            products.forEach((p, i) => {
+                const qtyBadge = `<span class="badge ${p.quantity < 10 ? 'badge-low' : 'badge-ok'}">${p.quantity}</span>`;
+                dtInstance.row.add([
+                    p.product_id,
+                    `<strong>${p.product_name}</strong>`,
+                    p.product_category || 'General',
+                    p.supplier_name || '—',
+                    p.invoice_number || '—',
+                    qtyBadge,
+                    `MK${parseFloat(p.unit_price).toFixed(2)}`
+                ]);
+            });
+            dtInstance.draw();
+        }
+    };
 
     /* ===================== STEP 2: INVOICE ===================== */
     document.getElementById('inv-back')?.addEventListener('click', () => openModal('modal-supplier'));
@@ -455,7 +469,7 @@ window.initProductsView = function () {
             number: num,
             date,
             terms: document.getElementById('inv-terms')?.value || 'Cash',
-            currency: document.getElementById('inv-currency')?.value || 'USD',
+            currency: document.getElementById('inv-currency')?.value || 'MK',
             notes: document.getElementById('inv-notes')?.value.trim() || '',
         };
         document.getElementById('items-stags').innerHTML =
@@ -494,7 +508,8 @@ window.initProductsView = function () {
             name,
             qty: parseFloat(document.getElementById('li-qty').value) || 1,
             price: parseFloat(document.getElementById('li-price').value) || 0,
-            category: document.getElementById('li-category').value,
+            category: document.getElementById('li-category')?.value || 'General',
+            description: '',   // description is set/overridden in Step 4
         });
         liFormOpen = false;
         document.getElementById('li-form').classList.remove('open');
@@ -506,6 +521,10 @@ window.initProductsView = function () {
             showFeedback('Please add at least one invoice item.', 'warning');
             return;
         }
+
+        // Calculate total_cost for the invoice
+        pState.invoice.total_cost = pState.lineItems.reduce((sum, item) => sum + (item.qty * item.price), 0);
+
         // populate product select
         const sel = document.getElementById('prod-select');
         sel.innerHTML = '';
@@ -563,26 +582,56 @@ window.initProductsView = function () {
         document.getElementById('prod-name').value = item.name;
         document.getElementById('prod-qty').value = item.qty;
         document.getElementById('prod-price').value = item.price.toFixed(2);
-        document.getElementById('prod-category').value = item.category;
+        // Match category dropdown — fall back to General if value not in list
+        const catSelect = document.getElementById('prod-category');
+        const matchingOpt = Array.from(catSelect.options).find(o => o.value === item.category || o.textContent === item.category);
+        catSelect.value = matchingOpt ? matchingOpt.value : 'General';
+        document.getElementById('prod-description').value = item.description || '';
     }
 
-    document.getElementById('prod-submit')?.addEventListener('click', () => {
+    document.getElementById('prod-submit')?.addEventListener('click', async () => {
         const name = document.getElementById('prod-name').value.trim();
         const qty = parseInt(document.getElementById('prod-qty').value) || 0;
         const price = parseFloat(document.getElementById('prod-price').value) || 0;
         const category = document.getElementById('prod-category').value;
+        const description = document.getElementById('prod-description').value.trim();
         if (!name) { setErr('prod-name', true); return; }
         setErr('prod-name', false);
 
-        addTableRow(name, category, pState.supplier.name, pState.invoice.number, qty, price);
+        // Update the selected line item with any Step-4 overrides before saving
+        const selIdx = parseInt(document.getElementById('prod-select')?.value);
+        if (!isNaN(selIdx) && pState.lineItems[selIdx]) {
+            pState.lineItems[selIdx].name = name;
+            pState.lineItems[selIdx].qty = qty;
+            pState.lineItems[selIdx].price = price;
+            pState.lineItems[selIdx].category = category;
+            pState.lineItems[selIdx].description = description;
+        }
 
-        // reset
-        pState.supplier = null;
-        pState.invoice = null;
-        pState.lineItems = [];
-        liFormOpen = false;
-        closeAll();
-        showFeedback(`"${name}" added to inventory successfully.`, 'success');
+        // Prepare full data object
+        const procurementData = {
+            supplier: pState.supplier,
+            invoice: pState.invoice,
+            lineItems: pState.lineItems
+        };
+
+        // Call backend to save
+        const result = await window.api.saveProcurement(procurementData);
+
+        if (result.success) {
+            // Re-load all products to ensure table is fresh
+            await loadProducts();
+
+            // reset state
+            pState.supplier = null;
+            pState.invoice = null;
+            pState.lineItems = [];
+            liFormOpen = false;
+            closeAll();
+            showFeedback(`"${name}" procurement saved to database successfully.`, 'success');
+        } else {
+            showFeedback(`Error: ${result.error}`, 'error');
+        }
     });
 
     /* ===================== ISSUE PRODUCT FLOW ===================== */
@@ -596,14 +645,31 @@ window.initProductsView = function () {
         // Pull rows from the inventory table
         let rows = [];
         if (typeof $ !== 'undefined' && dtInstance) {
-            dtInstance.rows().every(function () {
-                const d = this.data();
-                rows.push({ idx: this.index(), name: d[1].replace(/<[^>]+>/g, ''), category: d[2], qty: d[5].replace(/<[^>]+>/g, ''), price: d[6] });
+            dtInstance.rows().every(function (rowIdx) {
+                const data = this.data();
+                // data[0] is #ID, data[1] is Name, data[5] is Qty badge, data[6] is MKPrice
+                const id = data[0].replace('#', '');
+                const name = data[1].replace(/<\/?[^>]+(>|$)/g, "").trim();
+                const qtyText = data[5].replace(/<\/?[^>]+(>|$)/g, "").trim();
+                const priceText = data[6].replace('MK', '').trim();
+                rows.push({ id, name, category: data[2], qty: qtyText, price: parseFloat(priceText) || 0, idx: rowIdx });
             });
         } else {
             document.querySelectorAll('#products-tbody tr').forEach((tr, i) => {
                 const tds = tr.querySelectorAll('td');
-                if (tds.length >= 7) rows.push({ idx: i, name: tds[1].textContent.trim(), category: tds[2].textContent.trim(), qty: tds[5].textContent.trim(), price: tds[6].textContent.trim() });
+                if (tds.length >= 7) {
+                    const id = tds[0].textContent.replace('#', '').trim();
+                    const name = tds[1].textContent.trim();
+                    const priceText = tds[6].textContent.replace('MK', '').trim();
+                    rows.push({
+                        id,
+                        name,
+                        category: tds[2].textContent.trim(),
+                        qty: tds[5].textContent.trim(),
+                        price: parseFloat(priceText) || 0,
+                        idx: i
+                    });
+                }
             });
         }
 
@@ -685,6 +751,18 @@ window.initProductsView = function () {
             rowData[5] = `<span class="badge ${newQty < 10 ? 'badge-low' : 'badge-ok'}">${newQty}</span>`;
             dtInstance.row(issueSelected.idx).data(rowData).draw(false);
         }
+
+        // Log the issuance in audit log
+        window.api.logAction('Issue Product', `Issued ${qty} units of "${issueSelected.name}" (Ref: ${invoiceId})`);
+
+        // Persist to database
+        window.api.issueProduct({
+            product_id: issueSelected.id,
+            quantity: qty,
+            transaction_date: new Date().toISOString().split('T')[0],
+            transaction_description: `Issued to: ${document.getElementById('issue-recipient').value || 'Unknown'} - Ref: ${invoiceId}`,
+            unit_price: issueSelected.price
+        });
 
         closeAll();
         showFeedback(`Issued ${qty}× "${issueSelected.name}" — Ref: ${invoiceId}`, 'success');
