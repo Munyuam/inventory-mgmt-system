@@ -478,6 +478,12 @@ const loadView = async (viewName) => {
             if (user) {
                 document.getElementById('settings-username').value = user.username || '';
                 document.getElementById('settings-email').value = user.email || '';
+
+                // RBAC: Hide System Monitor if not admin
+                const sysmonCard = document.getElementById('settings-sysmon-card');
+                if (sysmonCard) {
+                    sysmonCard.style.display = user.role === 'admin' ? 'block' : 'none';
+                }
             }
 
             // Profile Update Handler
@@ -691,8 +697,8 @@ window.initProductsView = function () {
         const el = document.getElementById(fieldId);
         if (el) el.style.borderColor = hasErr ? '#ef4444' : '';
     }
-    function showFeedback(msg, type = 'success') {
-        const el = document.getElementById('product-feedback');
+    function showFeedback(msg, type = 'success', targetId = 'product-feedback') {
+        const el = document.getElementById(targetId);
         if (!el) return;
         el.textContent = msg;
         el.className = `auth-feedback ${type}`;
@@ -815,6 +821,12 @@ window.initProductsView = function () {
         document.getElementById('edit-prod-stock').textContent = product.quantity;
         document.getElementById('edit-prod-cost').textContent = product.unit_cost ? product.unit_cost.toFixed(2) : '0.00';
 
+        // Reset adjustment fields
+        const adjQty = document.getElementById('edit-adj-qty');
+        const adjReason = document.getElementById('edit-adj-reason');
+        if (adjQty) adjQty.value = '';
+        if (adjReason) adjReason.selectedIndex = 0;
+
         document.getElementById('modal-edit-product').classList.add('open');
     };
 
@@ -842,7 +854,59 @@ window.initProductsView = function () {
                 await loadProducts();
             }
         } else {
-            alert('Failed to update product: ' + result.error);
+            showFeedback('Failed to update product: ' + result.error, 'error', 'edit-prod-feedback');
+        }
+    });
+
+    document.getElementById('edit-adj-apply')?.addEventListener('click', async () => {
+        const productId = parseInt(document.getElementById('edit-prod-id').value);
+        const qtyInput = document.getElementById('edit-adj-qty');
+        const qty = parseInt(qtyInput.value);
+        const reason = document.getElementById('edit-adj-reason').value;
+
+        if (isNaN(qty) || qty === 0) {
+            showFeedback('Please enter a valid non-zero adjustment quantity.', 'warning', 'edit-prod-feedback');
+            return;
+        }
+
+        const btn = document.getElementById('edit-adj-apply');
+        const originalText = btn.textContent;
+        btn.textContent = 'Applying...';
+        btn.disabled = true;
+
+        console.log(`[UI] Applying adjustment: ${qty} for product ${productId}, reason: ${reason}`);
+
+        try {
+            const result = await window.api.adjustProductStock({
+                product_id: productId,
+                quantity: qty,
+                transaction_date: new Date().toISOString().split('T')[0],
+                transaction_description: `Adjustment: ${reason}`,
+                unit_price: 0
+            });
+
+            if (result.success) {
+                console.log('[UI] Adjustment successful');
+                qtyInput.value = '';
+                
+                if (typeof loadProducts === 'function') {
+                    await loadProducts();
+                    const updatedProd = (window.allProducts || []).find(p => p.product_id === productId);
+                    if (updatedProd) {
+                        document.getElementById('edit-prod-stock').textContent = updatedProd.quantity;
+                    }
+                }
+                showFeedback(`Stock successfully adjusted by ${qty}.`, 'success', 'edit-prod-feedback');
+            } else {
+                console.error('[UI] Adjustment failed:', result.error);
+                showFeedback('Failed to adjust stock: ' + result.error, 'error', 'edit-prod-feedback');
+            }
+        } catch (err) {
+            console.error('[UI] Critical error during adjustment:', err);
+            showFeedback('A critical error occurred: ' + err.message, 'error', 'edit-prod-feedback');
+        } finally {
+            btn.textContent = originalText;
+            btn.disabled = false;
         }
     });
 
@@ -910,7 +974,7 @@ window.initProductsView = function () {
 
     document.getElementById('items-next')?.addEventListener('click', () => {
         if (pState.lineItems.length === 0) {
-            showFeedback('Please add at least one invoice item.', 'warning');
+            showFeedback('Please add at least one invoice item.', 'warning', 'items-feedback');
             return;
         }
 
@@ -1031,9 +1095,9 @@ window.initProductsView = function () {
             pState.lineItems = [];
             liFormOpen = false;
             closeAll();
-            showFeedback(`"${name}" procurement saved to database successfully.`, 'success');
+            showFeedback(`"${name}" procurement saved to database successfully.`, 'success', 'product-modal-feedback');
         } else {
-            showFeedback(`Error: ${result.error}`, 'error');
+            showFeedback(`Error: ${result.error}`, 'error', 'product-modal-feedback');
         }
     });
 
@@ -1136,7 +1200,7 @@ window.initProductsView = function () {
 
     document.getElementById('issue-select-next')?.addEventListener('click', () => {
         if (!issueSelected) {
-            showFeedback('Please select a product to issue.', 'warning');
+            showFeedback('Please select a product to issue.', 'warning', 'issue-select-feedback');
             return;
         }
         // Pre-fill step 2 tags and defaults
@@ -1162,8 +1226,8 @@ window.initProductsView = function () {
 
         if (!invoiceId) { document.getElementById('issue-invoice-id').style.borderColor = '#f59e0b'; return; }
         document.getElementById('issue-invoice-id').style.borderColor = '';
-        if (qty < 1) { showFeedback('Quantity must be at least 1.', 'error'); return; }
-        if (qty > stockQty) { showFeedback(`Only ${stockQty} units available.`, 'error'); return; }
+        if (qty < 1) { showFeedback('Quantity must be at least 1.', 'error', 'issue-details-feedback'); return; }
+        if (qty > stockQty) { showFeedback(`Only ${stockQty} units available.`, 'error', 'issue-details-feedback'); return; }
 
         // Log the issuance in audit log
         const reason = document.getElementById('issue-reason')?.value || 'Issue';
@@ -1182,10 +1246,10 @@ window.initProductsView = function () {
             // Re-load all products to ensure everything is fresh
             await loadProducts();
             closeAll();
-            showFeedback(`Issued ${qty}× "${issueSelected.name}" — ${reason}`, 'success');
+            showFeedback(`Issued ${qty}× "${issueSelected.name}" — ${reason}`, 'success', 'issue-details-feedback');
             issueSelected = null;
         } else {
-            showFeedback('Failed to save issue transaction to database.', 'error');
+            showFeedback('Failed to save issue transaction to database.', 'error', 'issue-details-feedback');
         }
     });
 
@@ -1291,6 +1355,9 @@ const loadMovementSchedule = async (productId) => {
                 m.sales += t.quantity;
                 m.salesValue += (t.quantity * (t.unit_price || 0));
                 runningBalance -= t.quantity;
+            } else if (t.transaction_type === 'Adjustment') {
+                m.adjust += t.quantity;
+                runningBalance += t.quantity;
             }
 
             m.hand = runningBalance;
@@ -1363,3 +1430,4 @@ const loadMovementSchedule = async (productId) => {
         console.error('Movement schedule error:', err);
     }
 };
+

@@ -497,3 +497,216 @@
 [2026-03-12 14:31:17] [User: admin] Action: View Navigation - User navigated to "summary" page.
 [2026-03-12 14:31:32] [User: admin] Action: View Navigation - User navigated to "activity" page.
 [2026-03-12 14:32:41] [User: admin] Action: View Navigation - User navigated to "products" page.
+[2026-03-12 14:35:10] [User: admin] Action: View Navigation - User navigated to "dashboard" page.
+[2026-03-12 14:36:43] [User: admin] Action: View Navigation - User navigated to "products" page.
+[2026-03-12 14:36:44] [User: admin] Action: View Navigation - User navigated to "activity" page.
+[2026-03-12 14:36:46] [User: admin] Action: View Navigation - User navigated to "summary" page.
+[2026-03-12 14:36:47] [User: admin] Action: View Navigation - User navigated to "settings" page.
+[2026-03-12 14:46:08] [User: System] Action: System started - Application initialized and database connected.
+[2026-03-12 14:46:47] [User: Guest] Action: Account Creation Failed - Attempted username: mwiza, Error: Email already exists
+[2026-03-12 14:47:07] [User: mwiza] Action: Account Created - mwiza registered with email: bis22-msichinga@mubas.ac.mw
+[2026-03-12 14:47:08] [User: mwiza] Action: View Navigation - User navigated to "dashboard" page.
+[2026-03-12 14:47:11] [User: mwiza] Action: Logout - mwiza logged out
+[2026-03-12 14:47:23] [User: admin] Action: Login - admin logged in successfully
+[2026-03-12 14:47:23] [User: admin] Action: View Navigation - User navigated to "dashboard" page.
+[2026-03-12 14:48:16] [User: admin] Action: View Navigation - User navigated to "products" page.
+[2026-03-12 14:49:05] [User: admin] Action: Update Product - admin updated product: peanut butter (ID: 1)
+[2026-03-12 14:51:49] [User: admin] Action: Procurement Saved - admin processed invoice INv-2026-202 from waka ltd with 2 items.
+[2026-03-12 14:53:16] [User: admin] Action: Issue Product - Issued 5 units of "2L grape juice" (Ref: INv-2026-202) — Reason: Customer Sale
+[2026-03-12 14:55:51] [User: admin] Action: View Navigation - User navigated to "activity" page.
+[2026-03-12 14:58:08] [User: admin] Action: View Navigation - User navigated to "dashboard" page.
+[2026-03-12 14:58:09] [User: admin] Action: View Navigation - User navigated to "activity" page.
+[2026-03-12 14:59:18] [User: admin] Action: View Navigation - User navigated to "dashboard" page.
+[2026-03-12 14:59:20] [User: admin] Action: View Navigation - User navigated to "summary" page.
+[2026-03-12 14:59:22] [User: admin] Action: View Navigation - User navigated to "activity" page.
+[2026-03-12 14:59:43] [User: admin] Action: View Navigation - User navigated to "summary" page.
+[2026-03-12 15:01:07] [User: admin] Action: View Navigation - User navigated to "settings" page.
+[2026-03-12 15:01:40] [User: admin] Action: Change Password - admin changed their password.
+[2026-03-12 15:03:35] [User: admin] Action: View Navigation - User navigated to "settings" page.
+[2026-03-12 15:03:40] [User: admin] Action: View Navigation - User navigated to "dashboard" page.
+[2026-03-12 16:16:00] [User: admin] Action: View Navigation - User navigated to "products" page.
+[2026-03-12 16:16:10] [User: admin] Action: View Navigation - User navigated to "activity" page.
+[2026-03-12 16:17:00] [User: admin] Action: View Navigation - User navigated to "summary" page.
+[2026-03-12 16:17:04] [User: admin] Action: View Navigation - User navigated to "settings" page.
+[2026-03-12 16:17:07] [User: admin] Action: View Navigation - User navigated to "summary" page.
+[2026-03-12 16:17:09] [User: admin] Action: View Navigation - User navigated to "dashboard" page.
+[2026-03-12 16:17:25] [User: admin] Action: View Navigation - User navigated to "products" page.
+[2026-03-12 16:23:20] [User: admin] Action: View Navigation - User navigated to "activity" page.
+[2026-03-12 16:23:22] [User: admin] Action: View Navigation - User navigated to "summary" page.
+[2026-03-12 16:23:31] [User: admin] Action: View Navigation - User navigated to "dashboard" page.
+[2026-03-12 16:23:55] [User: admin] Action: Logout - admin logged out
+[2026-03-13 10:06:23] [User: System] Action: System started - Application initialized and database connected.
+[2026-03-13 10:07:20] [User: Willim] Action: Account Created - Willim registered with email: asantengwira@gmail.com
+[2026-03-13 10:07:21] [User: Willim] Action: View Navigation - User navigated to "dashboard" page.
+[2026-03-13 10:07:28] [User: Willim] Action: View Navigation - User navigated to "products" page.
+[2026-03-13 10:07:48] [User: Willim] Action: View Navigation - User navigated to "activity" page.
+[2026-03-13 10:07:53] [User: Willim] Action: View Navigation - User navigated to "summary" page.
+[2026-03-13 10:08:18] [User: Willim] Action: View Navigation - User navigated to "settings" page.
+[2026-03-13 10:10:15] [User: Willim] Action: View Navigation - User navigated to "dashboard" page.
+[2026-03-13 10:10:21] [User: Willim] Action: View Navigation - User navigated to "settings" page.
+[2026-03-13 10:16:47] [User: System] Action: System started - Application initialized and database connected.
+[2026-03-13 10:17:20] [User: willim] Action: Login Failed - Failed login attempt for user: willim. Reason: User not found
+[2026-03-13 10:17:42] [User: willim] Action: Login Failed - Failed login attempt for user: willim. Reason: User not found
+[2026-03-13 10:17:46] [User: willim] Action: Login Failed - Failed login attempt for user: willim. Reason: User not found
+[2026-03-13 10:17:51] [User: willim] Action: Login Failed - Failed login attempt for user: willim. Reason: User not found
+[2026-03-13 10:17:58] [User: william] Action: Login Failed - Failed login attempt for user: william. Reason: User not found
+[2026-03-13 10:17:59] [User: william] Action: Login Failed - Failed login attempt for user: william. Reason: User not found
+[2026-03-13 10:17:59] [User: william] Action: Login Failed - Failed login attempt for user: william. Reason: User not found
+[2026-03-13 10:18:57] [User: william] Action: Account Created - william registered with email: asantengwira21@gmail.com
+[2026-03-13 10:18:58] [User: william] Action: View Navigation - User navigated to "dashboard" page.
+[2026-03-13 10:19:01] [User: william] Action: View Navigation - User navigated to "settings" page.
+[2026-03-13 10:20:00] [User: william] Action: Logout - william logged out
+[2026-03-13 10:20:05] [User: Unknown] Action: Logout - Unknown logged out
+[2026-03-13 10:20:09] [User: Guest] Action: View Navigation - User navigated to "dashboard" page.
+[2026-03-13 10:20:14] [User: Unknown] Action: Logout - Unknown logged out
+[2026-03-13 10:20:16] [User: Unknown] Action: Logout - Unknown logged out
+[2026-03-13 10:20:17] [User: Unknown] Action: Logout - Unknown logged out
+[2026-03-13 10:20:19] [User: Guest] Action: View Navigation - User navigated to "products" page.
+[2026-03-13 10:21:50] [User: Guest] Action: View Navigation - User navigated to "activity" page.
+[2026-03-13 12:25:30] [User: Guest] Action: View Navigation - User navigated to "summary" page.
+[2026-03-13 12:25:34] [User: Guest] Action: View Navigation - User navigated to "settings" page.
+[2026-03-13 12:25:36] [User: Guest] Action: View Navigation - User navigated to "summary" page.
+[2026-03-14 04:22:32] [User: System] Action: System started - Application initialized and database connected.
+[2026-03-14 04:22:51] [User: admin] Action: Login Failed - Failed login attempt for user: admin. Reason: Invalid password
+[2026-03-14 04:22:56] [User: admin] Action: Login Failed - Failed login attempt for user: admin. Reason: Invalid password
+[2026-03-14 04:23:07] [User: admin] Action: Login Failed - Failed login attempt for user: admin. Reason: Invalid password
+[2026-03-14 04:23:11] [User: admin] Action: Login Failed - Failed login attempt for user: admin. Reason: Invalid password
+[2026-03-14 04:23:23] [User: Guest] Action: Account Creation Failed - Attempted username: admin, Error: Username already exists
+[2026-03-14 04:23:34] [User: admin2] Action: Account Created - admin2 registered with email: admin@gmail.com
+[2026-03-14 04:23:35] [User: admin2] Action: View Navigation - User navigated to "dashboard" page.
+[2026-03-14 04:23:39] [User: admin2] Action: View Navigation - User navigated to "products" page.
+[2026-03-14 04:25:06] [User: admin2] Action: Procurement Saved - admin2 processed invoice INV-2026-400 from sunfoil with 1 items.
+[2026-03-14 04:25:12] [User: admin2] Action: View Navigation - User navigated to "activity" page.
+[2026-03-14 04:25:14] [User: admin2] Action: View Navigation - User navigated to "summary" page.
+[2026-03-14 04:25:17] [User: admin2] Action: View Navigation - User navigated to "settings" page.
+[2026-03-14 04:42:03] [User: admin2] Action: View Navigation - User navigated to "dashboard" page.
+[2026-03-14 04:42:05] [User: admin2] Action: View Navigation - User navigated to "settings" page.
+[2026-03-14 04:42:25] [User: admin2] Action: Logout - admin2 logged out
+[2026-03-14 04:42:34] [User: admin2] Action: Login Failed - Failed login attempt for user: admin2. Reason: Invalid password
+[2026-03-14 04:42:41] [User: admin2] Action: Login Failed - Failed login attempt for user: admin2. Reason: Invalid password
+[2026-03-14 04:42:55] [User: admin] Action: Login Failed - Failed login attempt for user: admin. Reason: Invalid password
+[2026-03-14 04:43:04] [User: admin] Action: Login Failed - Failed login attempt for user: admin. Reason: Invalid password
+[2026-03-14 04:43:35] [User: admin] Action: Login Failed - Failed login attempt for user: admin. Reason: Invalid password
+[2026-03-14 04:43:43] [User: admin] Action: Login Failed - Failed login attempt for user: admin. Reason: Invalid password
+[2026-03-14 04:43:44] [User: admin] Action: Login Failed - Failed login attempt for user: admin. Reason: Invalid password
+[2026-03-14 04:43:44] [User: admin] Action: Login Failed - Failed login attempt for user: admin. Reason: Invalid password
+[2026-03-14 04:43:45] [User: admin] Action: Login Failed - Failed login attempt for user: admin. Reason: Invalid password
+[2026-03-14 04:43:45] [User: admin] Action: Login Failed - Failed login attempt for user: admin. Reason: Invalid password
+[2026-03-14 04:44:00] [User: admin] Action: Login Failed - Failed login attempt for user: admin. Reason: Invalid password
+[2026-03-14 04:44:14] [User: admin] Action: Login Failed - Failed login attempt for user: admin. Reason: Invalid password
+[2026-03-14 04:44:15] [User: admin] Action: Login Failed - Failed login attempt for user: admin. Reason: Invalid password
+[2026-03-14 04:44:15] [User: admin] Action: Login Failed - Failed login attempt for user: admin. Reason: Invalid password
+[2026-03-14 04:44:15] [User: admin] Action: Login Failed - Failed login attempt for user: admin. Reason: Invalid password
+[2026-03-14 04:44:16] [User: admin] Action: Login Failed - Failed login attempt for user: admin. Reason: Invalid password
+[2026-03-14 04:44:16] [User: admin] Action: Login Failed - Failed login attempt for user: admin. Reason: Invalid password
+[2026-03-14 04:44:16] [User: admin] Action: Login Failed - Failed login attempt for user: admin. Reason: Invalid password
+[2026-03-14 04:47:41] [User: admin3] Action: Account Created - admin3 registered with email: admin3@gmail.com
+[2026-03-14 04:47:42] [User: admin3] Action: View Navigation - User navigated to "dashboard" page.
+[2026-03-14 04:47:44] [User: admin3] Action: View Navigation - User navigated to "settings" page.
+[2026-03-14 04:47:52] [User: admin3] Action: View Navigation - User navigated to "dashboard" page.
+[2026-03-14 04:47:53] [User: admin3] Action: View Navigation - User navigated to "settings" page.
+[2026-03-15 15:32:12] [User: System] Action: System started - Application initialized and database connected.
+[2026-03-15 15:32:22] [User: admin3] Action: Login - admin3 logged in successfully
+[2026-03-15 15:32:23] [User: admin3] Action: View Navigation - User navigated to "dashboard" page.
+[2026-03-15 15:32:27] [User: admin3] Action: View Navigation - User navigated to "summary" page.
+[2026-03-15 15:32:32] [User: admin3] Action: View Navigation - User navigated to "settings" page.
+[2026-03-15 15:32:35] [User: admin3] Action: Update Profile - admin3 updated their profile details.
+[2026-03-15 15:32:40] [User: admin3] Action: Update Profile - admin3 updated their profile details.
+[2026-03-15 15:32:45] [User: admin3] Action: View Navigation - User navigated to "dashboard" page.
+[2026-03-15 15:32:47] [User: admin3] Action: View Navigation - User navigated to "settings" page.
+[2026-03-15 15:32:55] [User: admin3] Action: View Navigation - User navigated to "dashboard" page.
+[2026-03-15 15:32:57] [User: admin3] Action: View Navigation - User navigated to "settings" page.
+[2026-03-15 15:33:02] [User: admin3] Action: View Navigation - User navigated to "dashboard" page.
+[2026-03-15 15:35:58] [User: admin3] Action: View Navigation - User navigated to "products" page.
+[2026-03-15 15:36:00] [User: admin3] Action: View Navigation - User navigated to "activity" page.
+[2026-03-15 16:03:57] [User: System] Action: System started - Application initialized and database connected.
+[2026-03-15 16:04:06] [User: admin3] Action: Login Failed - Failed login attempt for user: admin3. Reason: User not found
+[2026-03-15 16:04:30] [User: Guest] Action: Account Creation Failed - Attempted username: admin, Error: Username already exists
+[2026-03-15 16:04:45] [User: admin] Action: Login - admin logged in successfully
+[2026-03-15 16:04:45] [User: admin] Action: View Navigation - User navigated to "dashboard" page.
+[2026-03-15 16:04:51] [User: admin] Action: View Navigation - User navigated to "products" page.
+[2026-03-15 16:04:54] [User: admin] Action: View Navigation - User navigated to "activity" page.
+[2026-03-15 16:04:55] [User: admin] Action: View Navigation - User navigated to "summary" page.
+[2026-03-15 16:04:58] [User: admin] Action: View Navigation - User navigated to "settings" page.
+[2026-03-15 16:05:03] [User: admin] Action: View Navigation - User navigated to "dashboard" page.
+[2026-03-15 16:05:08] [User: admin] Action: View Navigation - User navigated to "products" page.
+[2026-03-15 16:06:35] [User: admin] Action: Procurement Saved - admin processed invoice INV-2026-29 from lab processors with 1 items.
+[2026-03-15 16:06:42] [User: admin] Action: View Navigation - User navigated to "dashboard" page.
+[2026-03-15 16:06:51] [User: admin] Action: View Navigation - User navigated to "products" page.
+[2026-03-15 16:07:06] [User: admin] Action: View Navigation - User navigated to "activity" page.
+[2026-03-15 16:07:19] [User: admin] Action: View Navigation - User navigated to "dashboard" page.
+[2026-03-15 16:07:33] [User: admin] Action: View Navigation - User navigated to "summary" page.
+[2026-03-15 16:07:36] [User: admin] Action: View Navigation - User navigated to "activity" page.
+[2026-03-15 16:07:38] [User: admin] Action: View Navigation - User navigated to "summary" page.
+[2026-03-15 16:07:41] [User: admin] Action: View Navigation - User navigated to "dashboard" page.
+[2026-03-15 16:07:43] [User: admin] Action: View Navigation - User navigated to "summary" page.
+[2026-03-15 16:07:45] [User: admin] Action: View Navigation - User navigated to "activity" page.
+[2026-03-15 16:07:47] [User: admin] Action: View Navigation - User navigated to "products" page.
+[2026-03-15 16:13:12] [User: admin] Action: Issue Product - Issued 1 units of "peanut butter" (Ref: INV-2026-29) — Reason: Customer Sale
+[2026-03-15 16:13:15] [User: admin] Action: View Navigation - User navigated to "dashboard" page.
+[2026-03-15 16:13:18] [User: admin] Action: View Navigation - User navigated to "products" page.
+[2026-03-15 16:13:35] [User: admin] Action: View Navigation - User navigated to "dashboard" page.
+[2026-03-15 16:14:26] [User: admin] Action: View Navigation - User navigated to "products" page.
+[2026-03-15 16:16:08] [User: admin] Action: View Navigation - User navigated to "dashboard" page.
+[2026-03-15 16:16:09] [User: admin] Action: View Navigation - User navigated to "products" page.
+[2026-03-15 16:17:34] [User: admin] Action: Procurement Saved - admin processed invoice INV-2026-900 from Azamu ltd with 1 items.
+[2026-03-15 16:17:37] [User: admin] Action: View Navigation - User navigated to "dashboard" page.
+[2026-03-15 16:17:44] [User: admin] Action: View Navigation - User navigated to "activity" page.
+[2026-03-15 16:17:45] [User: admin] Action: View Navigation - User navigated to "products" page.
+[2026-03-15 16:17:58] [User: admin] Action: View Navigation - User navigated to "dashboard" page.
+[2026-03-15 16:18:02] [User: admin] Action: View Navigation - User navigated to "products" page.
+[2026-03-15 16:44:52] [User: admin] Action: View Navigation - User navigated to "dashboard" page.
+[2026-03-15 16:44:54] [User: admin] Action: View Navigation - User navigated to "products" page.
+[2026-03-15 16:50:42] [User: System] Action: System started - Application initialized and database connected.
+[2026-03-15 16:50:47] [User: admin] Action: Login - admin logged in successfully
+[2026-03-15 16:50:48] [User: admin] Action: View Navigation - User navigated to "dashboard" page.
+[2026-03-15 16:50:52] [User: admin] Action: View Navigation - User navigated to "summary" page.
+[2026-03-15 16:51:02] [User: admin] Action: View Navigation - User navigated to "products" page.
+[2026-03-15 16:52:46] [User: admin] Action: View Navigation - User navigated to "dashboard" page.
+[2026-03-15 16:52:48] [User: admin] Action: View Navigation - User navigated to "products" page.
+[2026-03-15 16:57:16] [User: System] Action: System started - Application initialized and database connected.
+[2026-03-15 16:57:22] [User: admin] Action: Login - admin logged in successfully
+[2026-03-15 16:57:23] [User: admin] Action: View Navigation - User navigated to "dashboard" page.
+[2026-03-15 16:57:26] [User: admin] Action: View Navigation - User navigated to "products" page.
+[2026-03-15 16:57:37] [User: admin] Action: Update Product - admin updated product: peanut butter (ID: 1)
+[2026-03-15 16:58:55] [User: admin] Action: View Navigation - User navigated to "dashboard" page.
+[2026-03-15 16:58:59] [User: admin] Action: View Navigation - User navigated to "activity" page.
+[2026-03-15 16:59:01] [User: admin] Action: View Navigation - User navigated to "products" page.
+[2026-03-15 16:59:31] [User: admin] Action: View Navigation - User navigated to "dashboard" page.
+[2026-03-15 16:59:34] [User: admin] Action: View Navigation - User navigated to "summary" page.
+[2026-03-15 16:59:37] [User: admin] Action: View Navigation - User navigated to "products" page.
+[2026-03-15 16:59:38] [User: admin] Action: View Navigation - User navigated to "dashboard" page.
+[2026-03-15 16:59:54] [User: admin] Action: View Navigation - User navigated to "summary" page.
+[2026-03-15 17:00:00] [User: admin] Action: View Navigation - User navigated to "activity" page.
+[2026-03-15 17:13:55] [User: admin] Action: View Navigation - User navigated to "dashboard" page.
+[2026-03-15 17:13:56] [User: admin] Action: View Navigation - User navigated to "activity" page.
+[2026-03-15 17:14:09] [User: admin] Action: View Navigation - User navigated to "products" page.
+[2026-03-15 17:14:13] [User: admin] Action: View Navigation - User navigated to "activity" page.
+[2026-03-15 17:14:29] [User: System] Action: System started - Application initialized and database connected.
+[2026-03-15 17:14:35] [User: admin] Action: Login - admin logged in successfully
+[2026-03-15 17:14:36] [User: admin] Action: View Navigation - User navigated to "dashboard" page.
+[2026-03-15 17:14:37] [User: admin] Action: View Navigation - User navigated to "activity" page.
+[2026-03-15 17:23:08] [User: System] Action: System started - Application initialized and database connected.
+[2026-03-15 17:23:13] [User: admin] Action: Login - admin logged in successfully
+[2026-03-15 17:23:14] [User: admin] Action: View Navigation - User navigated to "dashboard" page.
+[2026-03-15 17:23:18] [User: admin] Action: View Navigation - User navigated to "activity" page.
+[2026-03-15 17:31:44] [User: System] Action: System started - Application initialized and database connected.
+[2026-03-15 17:31:51] [User: admin] Action: Login - admin logged in successfully
+[2026-03-15 17:31:51] [User: admin] Action: View Navigation - User navigated to "dashboard" page.
+[2026-03-15 17:31:53] [User: admin] Action: View Navigation - User navigated to "activity" page.
+[2026-03-15 17:32:00] [User: admin] Action: View Navigation - User navigated to "dashboard" page.
+[2026-03-15 17:32:01] [User: admin] Action: View Navigation - User navigated to "activity" page.
+[2026-03-15 17:33:55] [User: admin] Action: View Navigation - User navigated to "summary" page.
+[2026-03-15 17:33:58] [User: admin] Action: View Navigation - User navigated to "settings" page.
+[2026-03-15 17:48:32] [User: System] Action: System started - Application initialized and database connected.
+[2026-03-15 17:48:39] [User: admin] Action: Login - admin logged in successfully
+[2026-03-15 17:48:40] [User: admin] Action: View Navigation - User navigated to "dashboard" page.
+[2026-03-15 17:48:43] [User: admin] Action: View Navigation - User navigated to "settings" page.
+[2026-03-15 17:48:48] [User: admin] Action: Logout - admin logged out
+[2026-03-15 17:49:51] [User: mwiza] Action: Account Created - mwiza registered with email: manyumasichinga66@gmail.com
+[2026-03-15 17:49:52] [User: mwiza] Action: View Navigation - User navigated to "dashboard" page.
+[2026-03-15 17:49:54] [User: mwiza] Action: View Navigation - User navigated to "settings" page.
+[2026-03-15 17:50:11] [User: mwiza] Action: View Navigation - User navigated to "summary" page.
+[2026-03-15 17:50:18] [User: mwiza] Action: View Navigation - User navigated to "dashboard" page.
+[2026-03-15 17:50:21] [User: mwiza] Action: View Navigation - User navigated to "products" page.
+[2026-03-15 17:50:30] [User: mwiza] Action: View Navigation - User navigated to "dashboard" page.

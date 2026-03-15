@@ -11,6 +11,7 @@ contextBridge.exposeInMainWorld('api', {
     saveProcurement: (data) => ipcRenderer.invoke('save-procurement', data),
     logAction: (action, details) => ipcRenderer.invoke('emit-log', { action, details }),
     issueProduct: (data) => ipcRenderer.invoke('issue-product', data),
+    adjustProductStock: (data) => ipcRenderer.invoke('adjust-product-stock', data),
     updateProduct: (data) => ipcRenderer.invoke('update-product', data),
     updateProfile: (data) => ipcRenderer.invoke('update-profile', data),
     changePassword: (data) => ipcRenderer.invoke('change-password', data),

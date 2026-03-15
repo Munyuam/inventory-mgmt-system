@@ -13,69 +13,89 @@ const initDb = (userDataPath) => {
 
   console.log("database path: " + dbPath);
 
-  // Initialize tables
-  db.exec(`
-      CREATE TABLE IF NOT EXISTS users (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      username TEXT UNIQUE NOT NULL,
-      email TEXT UNIQUE NOT NULL,
-      password TEXT NOT NULL,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-  );
+  db.exec(`  
+          CREATE TABLE IF NOT EXISTS users (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            username TEXT UNIQUE NOT NULL,
+            email TEXT UNIQUE NOT NULL,
+            password TEXT NOT NULL,
+            role TEXT DEFAULT 'staff',
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        );
 
-  CREATE TABLE IF NOT EXISTS suppliers (
-      supplier_id INTEGER PRIMARY KEY AUTOINCREMENT,
-      supplier_name TEXT NOT NULL,
-      phone TEXT,
-      email TEXT
-  );
+        CREATE TABLE IF NOT EXISTS suppliers (
+              supplier_id INTEGER PRIMARY KEY AUTOINCREMENT,
+              supplier_name TEXT NOT NULL,
+              phone TEXT,
+              email TEXT
+        );
 
-  CREATE TABLE IF NOT EXISTS products (
-      product_id INTEGER PRIMARY KEY AUTOINCREMENT,
-      product_name TEXT NOT NULL,
-      product_description TEXT,
-      product_category TEXT NOT NULL,
-      unit_price REAL
-  );
+        CREATE TABLE IF NOT EXISTS products (
+              product_id INTEGER PRIMARY KEY AUTOINCREMENT,
+              product_name TEXT NOT NULL,
+              product_description TEXT,
+              product_category TEXT NOT NULL,
+              unit_price REAL
+        );
 
-  CREATE TABLE IF NOT EXISTS invoices (
-      invoice_id INTEGER PRIMARY KEY AUTOINCREMENT,
-      user_id INTEGER NOT NULL,
-      supplier_id INTEGER NOT NULL,
-      date TEXT NOT NULL,
-      total_cost REAL,
-      invoice_number TEXT,
-      payment_terms TEXT,
+        CREATE TABLE IF NOT EXISTS invoices (
+          invoice_id INTEGER PRIMARY KEY AUTOINCREMENT,
+          user_id INTEGER NOT NULL,
+          supplier_id INTEGER NOT NULL,
+          date TEXT NOT NULL,
+          total_cost REAL,
+          invoice_number TEXT,
+          payment_terms TEXT,
+          FOREIGN KEY (user_id) REFERENCES users(id),
+          FOREIGN KEY (supplier_id) REFERENCES suppliers(supplier_id)
+     );
 
-      FOREIGN KEY (user_id) REFERENCES users(id),
-      FOREIGN KEY (supplier_id) REFERENCES suppliers(supplier_id)
-  );
+        CREATE TABLE IF NOT EXISTS invoice_items (
+          invoice_items_id INTEGER PRIMARY KEY AUTOINCREMENT,
+          invoice_id INTEGER NOT NULL,
+          product_id INTEGER NOT NULL,
+          quantity INTEGER NOT NULL,
+          unit_cost REAL NOT NULL,
+          FOREIGN KEY (invoice_id) REFERENCES invoices(invoice_id),
+          FOREIGN KEY (product_id) REFERENCES products(product_id)
+        );
 
-  CREATE TABLE IF NOT EXISTS invoice_items (
-      invoice_items_id INTEGER PRIMARY KEY AUTOINCREMENT,
-      invoice_id INTEGER NOT NULL,
-      product_id INTEGER NOT NULL,
-      quantity INTEGER NOT NULL,
-      unit_cost REAL NOT NULL,
+        CREATE TABLE IF NOT EXISTS transactions (
+          transaction_id INTEGER PRIMARY KEY AUTOINCREMENT,
+          invoice_item_id INTEGER,
+          product_id INTEGER NOT NULL,
+          transaction_date TEXT NOT NULL,
+          transaction_type TEXT NOT NULL,
+          transaction_description TEXT,
+          quantity INTEGER NOT NULL,
+          unit_price REAL,
+          FOREIGN KEY (product_id) REFERENCES products(product_id),
+          FOREIGN KEY (invoice_item_id) REFERENCES invoice_items(invoice_items_id)
+        );
+    `);
 
-      FOREIGN KEY (invoice_id) REFERENCES invoices(invoice_id),
-      FOREIGN KEY (product_id) REFERENCES products(product_id)
-  );
+  // Migration: Add role column if it doesn't exist
+  const tableInfo = db.pragma('table_info(users)');
+  const roleColumnExists = tableInfo.some(col => col.name === 'role');
+  if (!roleColumnExists) {
+    console.log("Migrating users table: adding role column...");
+    db.exec("ALTER TABLE users ADD COLUMN role TEXT DEFAULT 'staff'");
+  }
 
-  CREATE TABLE IF NOT EXISTS transactions (
-      transaction_id INTEGER PRIMARY KEY AUTOINCREMENT,
-      invoice_item_id INTEGER,
-      product_id INTEGER NOT NULL,
-      transaction_date TEXT NOT NULL,
-      transaction_type TEXT NOT NULL,
-      transaction_description TEXT,
-      quantity INTEGER NOT NULL,
-      unit_price REAL,
-
-      FOREIGN KEY (product_id) REFERENCES products(product_id),
-      FOREIGN KEY (invoice_item_id) REFERENCES invoice_items(invoice_items_id)
-  );
-  `);
+  // Ensure default admin user exists
+  const adminUser = db.prepare("SELECT id FROM users WHERE username = 'admin'").get();
+  if (!adminUser) {
+    console.log("Creating default admin user...");
+    const saltRounds = 10;
+    const adminPasswordHash = bcrypt.hashSync('admin', saltRounds);
+    db.prepare("INSERT INTO users (username, email, password, role) VALUES (?, ?, ?, ?)").run(
+      'admin',
+      'admin@system.com',
+      adminPasswordHash,
+      'admin'
+    );
+    console.log("Default admin user created successfully.");
+  }
 
   return db;
 };
@@ -85,7 +105,12 @@ async function getProducts(userDataPath) {
   return db.prepare(`
     SELECT
       p.*,
-      COALESCE(SUM(CASE WHEN t.transaction_type = 'Procurement' THEN t.quantity ELSE -t.quantity END), 0) AS quantity,
+      COALESCE(SUM(CASE 
+        WHEN t.transaction_type = 'Procurement' THEN t.quantity 
+        WHEN t.transaction_type = 'Adjustment'  THEN t.quantity 
+        WHEN t.transaction_type = 'Issue'       THEN -t.quantity 
+        ELSE 0 
+      END), 0) AS quantity,
       COALESCE(SUM(CASE WHEN t.transaction_type = 'Issue'       THEN t.quantity ELSE 0           END), 0) AS issued_count,
       s.supplier_name,
       inv.invoice_number,
@@ -129,8 +154,8 @@ async function registerUser(userDataPath, username, email, password) {
   try {
     const saltRounds = 10;
     const hash = await bcrypt.hash(password, saltRounds);
-    const stmt = db.prepare('INSERT INTO users (username, email, password) VALUES (?, ?, ?)');
-    stmt.run(username, email, hash);
+    const stmt = db.prepare('INSERT INTO users (username, email, password, role) VALUES (?, ?, ?, ?)');
+    stmt.run(username, email, hash, 'staff');
     return { success: true };
   } catch (error) {
     if (error.message.includes('UNIQUE constraint failed')) {
@@ -149,7 +174,7 @@ async function authenticateUser(userDataPath, username, password) {
   const match = await bcrypt.compare(password, user.password);
   if (!match) return { success: false, error: 'Invalid password' };
 
-  return { success: true, user: { id: user.id, username: user.username, email: user.email } };
+  return { success: true, user: { id: user.id, username: user.username, email: user.email, role: user.role } };
 }
 
 async function saveFullProcurement(userDataPath, data) {
@@ -282,6 +307,27 @@ function updateProduct(userDataPath, data) {
   }
 }
 
+async function adjustProductStock(userDataPath, data) {
+  if (!db) initDb(userDataPath);
+  const { product_id, quantity, transaction_date, transaction_description, unit_price } = data;
+
+  console.log(`[Adjustment] Product: ${product_id}, Qty: ${quantity}, Reason: ${transaction_description}`);
+
+  try {
+    const stmt = db.prepare(`
+      INSERT INTO transactions (
+        product_id, transaction_date, transaction_type, transaction_description, quantity, unit_price
+      ) VALUES (?, ?, ?, ?, ?, ?)
+    `);
+
+    const res = stmt.run(product_id, transaction_date, 'Adjustment', transaction_description || 'Stock Adjustment', quantity, unit_price || 0);
+    return { success: true, changes: res.changes };
+  } catch (err) {
+    console.error('[Adjustment] FAILED:', err.message);
+    return { success: false, error: err.message };
+  }
+}
+
 // --- User Management Logic ---
 
 async function updateUserProfile(userDataPath, userId, username, email) {
@@ -291,9 +337,13 @@ async function updateUserProfile(userDataPath, userId, username, email) {
     const existingUser = db.prepare('SELECT id FROM users WHERE username = ? AND id != ?').get(username, userId);
     if (existingUser) return { success: false, error: 'Username is already taken by another account.' };
 
+    console.log("Existing user is: ", existingUser);
+
     // 2. Check for Email collision
     const existingEmail = db.prepare('SELECT id FROM users WHERE email = ? AND id != ?').get(email, userId);
     if (existingEmail) return { success: false, error: 'Email address is already in use by another account.' };
+
+    console.log("Existing email is: ", existingEmail);
 
     // 3. Perform update
     const stmt = db.prepare(`UPDATE users SET username = ?, email = ? WHERE id = ?`);
@@ -333,6 +383,7 @@ module.exports = {
   getTransactions,
   addProduct,
   issueProduct,
+  adjustProductStock,
   updateProduct,
   saveFullProcurement,
   // --- Auth Logic ---

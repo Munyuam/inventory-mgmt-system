@@ -689,6 +689,8 @@
         </div>
         <div class="modal-title">Step 1 of 4 — Supplier</div>
         <div class="modal-subtitle">Who is supplying this product?</div>
+        <div id="supplier-feedback" class="auth-feedback" style="display:none; margin-bottom:10px;"></div>
+        <div id="supplier-feedback" class="auth-feedback" style="display:none; margin-bottom:10px;"></div>
 
         <div class="mf" id="mf-sup-name">
             <label>Supplier Name *</label>
@@ -724,6 +726,7 @@
         </div>
         <div class="modal-title">Step 2 of 4 — Invoice</div>
         <div class="modal-subtitle">Attach a supplier invoice to this procurement.</div>
+        <div id="invoice-feedback" class="auth-feedback" style="display:none; margin-bottom:10px;"></div>
         <div class="stags" id="inv-stags"></div>
 
         <div class="mrow">
@@ -767,6 +770,7 @@
         </div>
         <div class="modal-title">Step 3 of 4 — Invoice Items</div>
         <div class="modal-subtitle">List all items on this invoice.</div>
+        <div id="items-feedback" class="auth-feedback" style="display:none; margin-bottom:10px;"></div>
         <div class="stags" id="items-stags"></div>
 
         <div class="li-list" id="li-list"></div>
@@ -792,21 +796,25 @@
                     <input type="number" id="li-qty" min="1" value="1" />
                 </div>
                 <div class="mf">
-                    <label>Unit Price *</label>
+                    <label>Unit Cost *</label>
                     <input type="number" id="li-price" min="0" step="0.01" value="0.00" />
                 </div>
             </div>
             <div class="mf">
                 <label>Category</label>
                 <select id="li-category">
-                    <option>Beverages</option>
                     <option>Snacks</option>
-                    <option>Dairy &amp; Eggs</option>
-                    <option>Household</option>
+                    <option>Drinks</option>
+                    <option>Groceries</option>
+                    <option>Fresh Food</option>
+                    <option>Dairy</option>
+                    <option>Produce (Fruits & Vegetables)</option>
                     <option>Personal Care</option>
-                    <option>Frozen Foods</option>
-                    <option>Bakery</option>
-                    <option>Canned Goods</option>
+                    <option>Household Supplies</option>
+                    <option>Baby Products</option>
+                    <option>Stationery</option>
+                    <option>Electronics Accessories</option>
+                    <option>Health Products</option>
                     <option selected>General</option>
                 </select>
             </div>
@@ -837,6 +845,7 @@
         </div>
         <div class="modal-title">Step 4 of 4 — Product Details</div>
         <div class="modal-subtitle">Select an invoice item and confirm its stock details.</div>
+        <div id="product-modal-feedback" class="auth-feedback" style="display:none; margin-bottom:10px;"></div>
         <div class="stags" id="prod-stags"></div>
 
         <div class="mf">
@@ -869,15 +878,19 @@
         <div class="mf">
             <label>Category</label>
             <select id="prod-category">
-                <option>Beverages</option>
                 <option>Snacks</option>
-                <option>Dairy & Eggs</option>
-                <option>Household</option>
+                <option>Drinks</option>
+                <option>Groceries</option>
+                <option>Fresh Food</option>
+                <option>Dairy</option>
+                <option>Produce (Fruits & Vegetables)</option>
                 <option>Personal Care</option>
-                <option>Frozen Foods</option>
-                <option>Bakery</option>
-                <option>Canned Goods</option>
-                <option>General</option>
+                <option>Household Supplies</option>
+                <option>Baby Products</option>
+                <option>Stationery</option>
+                <option>Electronics Accessories</option>
+                <option>Health Products</option>
+                <option selected>General</option>
             </select>
         </div>
 
@@ -903,6 +916,7 @@
         </div>
         <div class="modal-title">Issue Stock — Step 1 of 2</div>
         <div class="modal-subtitle">Select the product you want to issue from inventory.</div>
+        <div id="issue-select-feedback" class="auth-feedback" style="display:none; margin-bottom:10px;"></div>
 
         <div class="mf">
             <label>Search Products</label>
@@ -930,6 +944,7 @@
         </div>
         <div class="modal-title">Issue Stock — Step 2 of 2</div>
         <div class="modal-subtitle">Fill in the issuance details.</div>
+        <div id="issue-details-feedback" class="auth-feedback" style="display:none; margin-bottom:10px;"></div>
         <div class="stags" id="issue-detail-tags"></div>
 
         <div class="mrow">
@@ -971,6 +986,7 @@
         <div class="modal-header">
             <h2>Edit Product</h2>
             <div class="subtitle">Update product details</div>
+            <div id="edit-prod-feedback" class="auth-feedback" style="display:none; margin-bottom:10px;"></div>
         </div>
         <div class="modal-body">
             <input type="hidden" id="edit-prod-id" />
@@ -984,17 +1000,19 @@
                 <div class="mf">
                     <label>Category *</label>
                     <select id="edit-prod-category">
-                        <option>Beverages</option>
                         <option>Snacks</option>
-                        <option>Dairy &amp; Eggs</option>
-                        <option>Household</option>
+                        <option>Drinks</option>
+                        <option>Groceries</option>
+                        <option>Fresh Food</option>
+                        <option>Dairy</option>
+                        <option>Produce (Fruits & Vegetables)</option>
                         <option>Personal Care</option>
-                        <option>Frozen Foods</option>
-                        <option>Bakery</option>
-                        <option>Produce</option>
-                        <option>Meat &amp; Seafood</option>
-                        <option>Canned Goods</option>
-                        <option>General</option>
+                        <option>Household Supplies</option>
+                        <option>Baby Products</option>
+                        <option>Stationery</option>
+                        <option>Electronics Accessories</option>
+                        <option>Health Products</option>
+                        <option selected>General</option>
                     </select>
                 </div>
                 <div class="mf">
@@ -1018,6 +1036,29 @@
                     <label style="color: var(--text-muted); font-size: 0.8rem;">Unit Cost (MK)</label>
                     <div id="edit-prod-cost" style="font-weight: 500;">0.00</div>
                 </div>
+            </div>
+
+            <!-- Stock Adjustment Section -->
+            <div style="margin-top: 15px; padding-top: 15px; border-top: 1px dashed var(--border-subtle);">
+                <h4 style="font-size: 0.85rem; text-transform: uppercase; color: var(--text-muted); margin-bottom: 10px;">Stock Adjustment</h4>
+                <div class="mrow">
+                    <div class="mf">
+                        <label>Adj. Qty (+ or -)</label>
+                        <input type="number" id="edit-adj-qty" placeholder="e.g. -5 or 10" />
+                    </div>
+                    <div class="mf">
+                        <label>Reason</label>
+                        <select id="edit-adj-reason">
+                            <option>Correction</option>
+                            <option>Damaged</option>
+                            <option>Found items</option>
+                            <option>Expired</option>
+                            <option>Stocktake Correction</option>
+                            <option>Other</option>
+                        </select>
+                    </div>
+                </div>
+                <button class="mbtn mbtn-ghost" id="edit-adj-apply" style="width: 100%; border: 1px solid var(--primary); color: var(--primary); background: transparent;">Apply Adjustment</button>
             </div>
         </div>
 

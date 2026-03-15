@@ -35,7 +35,7 @@ app.whenReady().then(() => {
     ipcMain.handle('auth-signup', async (event, { username, email, password }) => {
         const result = await db.registerUser(userDataPath, username, email, password);
         if (result.success) {
-            currentUser = { username, email };
+            currentUser = { username, email, role: 'staff' };
             logAction(username, 'Account Created', `${username} registered with email: ${email}`);
         } else {
             logAction('Guest', 'Account Creation Failed', `Attempted username: ${username}, Error: ${result.error}`);
@@ -106,6 +106,10 @@ app.whenReady().then(() => {
 
     ipcMain.handle('issue-product', async (event, data) => {
         return db.issueProduct(userDataPath, data);
+    });
+
+    ipcMain.handle('adjust-product-stock', async (event, data) => {
+        return db.adjustProductStock(userDataPath, data);
     });
 
     ipcMain.handle('update-product', async (event, data) => {
