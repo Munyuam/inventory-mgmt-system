@@ -149,13 +149,13 @@ async function addProduct(userDataPath, name, price, category = 'General') {
 }
 
 // --- Auth Logic ---
-async function registerUser(userDataPath, username, email, password) {
+async function registerUser(userDataPath, username, email, password, role = 'staff') {
   if (!db) initDb(userDataPath);
   try {
     const saltRounds = 10;
     const hash = await bcrypt.hash(password, saltRounds);
     const stmt = db.prepare('INSERT INTO users (username, email, password, role) VALUES (?, ?, ?, ?)');
-    stmt.run(username, email, hash, 'staff');
+    stmt.run(username, email, hash, role);
     return { success: true };
   } catch (error) {
     if (error.message.includes('UNIQUE constraint failed')) {
@@ -376,6 +376,36 @@ async function changeUserPassword(userDataPath, userId, currentPassword, newPass
   }
 }
 
+async function getUsers(userDataPath) {
+  if (!db) initDb(userDataPath);
+  return db.prepare('SELECT id, username, email, role FROM users ORDER BY username ASC').all();
+}
+
+async function adminUpdateUser(userDataPath, userId, { username, email, role }) {
+  if (!db) initDb(userDataPath);
+  try {
+    const stmt = db.prepare('UPDATE users SET username = ?, email = ?, role = ? WHERE id = ?');
+    stmt.run(username, email, role, userId);
+    return { success: true };
+  } catch (error) {
+    if (error.message.includes('UNIQUE constraint failed')) {
+      return { success: false, error: 'Username or email already exists' };
+    }
+    return { success: false, error: 'Failed to update user: ' + error.message };
+  }
+}
+
+async function adminDeleteUser(userDataPath, userId) {
+  if (!db) initDb(userDataPath);
+  try {
+    const stmt = db.prepare('DELETE FROM users WHERE id = ?');
+    stmt.run(userId);
+    return { success: true };
+  } catch (error) {
+    return { success: false, error: 'Failed to delete user: ' + error.message };
+  }
+}
+
 module.exports = {
   initDb,
   // --- Products Logic ---
@@ -390,5 +420,8 @@ module.exports = {
   registerUser,
   authenticateUser,
   updateUserProfile,
-  changeUserPassword
+  changeUserPassword,
+  getUsers,
+  adminUpdateUser,
+  adminDeleteUser
 };

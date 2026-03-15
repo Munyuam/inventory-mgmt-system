@@ -1,50 +1,149 @@
-<div class="settings-grid">
-    <div class="content-card">
-        <div class="card-header">Profile Management</div>
-        <form class="auth-form" id="settings-profile-form">
-            <div class="input-group">
-                <label>Display Name</label>
-                <input type="text" id="settings-username" placeholder="Loading...">
+<div class="settings-view-container">
+    
+    <!-- SECTION 1: Personal Account -->
+    <div class="settings-section">
+        <div class="settings-section-header">
+            <div class="header-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
             </div>
-            <div class="input-group">
-                <label>Email Address</label>
-                <input type="email" id="settings-email" placeholder="Loading...">
+            <h2>Account Settings</h2>
+        </div>
+        
+        <div class="settings-grid-two-col">
+            <!-- Profile Card -->
+            <div class="content-card">
+                <div class="card-header">Profile Management</div>
+                <form class="auth-form" id="settings-profile-form">
+                    <div class="input-group">
+                        <label>Display Name</label>
+                        <input type="text" id="settings-username" placeholder="Loading...">
+                    </div>
+                    <div class="input-group">
+                        <label>Email Address</label>
+                        <input type="email" id="settings-email" placeholder="Loading...">
+                    </div>
+                    <button type="button" class="submit-btn" id="settings-update-profile-btn">Update Profile</button>
+                </form>
             </div>
-            <button type="button" class="submit-btn" id="settings-update-profile-btn">Update Profile</button>
-        </form>
-    </div>
-    <div class="content-card">
-        <div class="card-header">Security</div>
-        <form class="auth-form" id="settings-security-form">
-            <div class="input-group">
-                <label>Current Password</label>
-                <input type="password" id="settings-cur-pass" placeholder="••••••••">
+
+            <!-- Security Card -->
+            <div class="content-card">
+                <div class="card-header">Security</div>
+                <form class="auth-form" id="settings-security-form">
+                    <div class="input-group">
+                        <label>Current Password</label>
+                        <input type="password" id="settings-cur-pass" placeholder="••••••••">
+                    </div>
+                    <div class="input-group">
+                        <label>New Password</label>
+                        <input type="password" id="settings-new-pass" placeholder="••••••••">
+                    </div>
+                    <button type="button" class="submit-btn bg-error" id="settings-change-pwd-btn">Change Password</button>
+                </form>
             </div>
-            <div class="input-group">
-                <label>New Password</label>
-                <input type="password" id="settings-new-pass" placeholder="••••••••">
-            </div>
-            <button type="button" class="submit-btn bg-error" id="settings-change-pwd-btn">Change Password</button>
-        </form>
+        </div>
     </div>
 
-    <!-- System Monitor -->
-    <div id="settings-sysmon-card" class="content-card" style="grid-column: 1 / -1; margin-top: 10px;">
-        <div class="card-header" style="display:flex; justify-content:space-between; align-items:center;">
-            <span>System Information</span>
-            <button class="sysmon-btn" id="settings-sysmon-btn">
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
-                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                    class="lucide lucide-monitor">
-                    <rect width="20" height="14" x="2" y="3" rx="2" />
-                    <line x1="8" x2="16" y1="21" y2="21" />
-                    <line x1="12" x2="12" y1="17" y2="21" />
-                </svg>
-                <span>System Monitor</span>
-            </button>
+    <!-- SECTION 2: System Administration (Admin Only) -->
+    <div id="admin-settings-section" class="settings-section admin-zone-accent" style="display: none;">
+        <div class="settings-section-header">
+            <div class="header-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            </div>
+            <h2>System Administration</h2>
         </div>
-        <div id="settings-sysmon-container" class="sysmon-log-view">
-            <div id="settings-sysmon-content" style="white-space: pre-wrap;"></div>
+
+        <!-- User Management Card -->
+        <div class="content-card" id="settings-user-mgmt-card" style="margin-bottom: 24px;">
+            <div class="card-header">User Management</div>
+            <div id="user-mgmt-feedback" class="auth-feedback" style="display: none; margin-bottom: 15px;"></div>
+            
+            <!-- Add User Form -->
+            <form class="auth-form" id="settings-add-user-form" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; align-items: end; margin-bottom: 30px; padding-bottom: 20px; border-bottom: 1px dashed var(--border-subtle);">
+                <div class="input-group">
+                    <label>Username</label>
+                    <input type="text" id="new-user-username" placeholder="johndoe" required>
+                </div>
+                <div class="input-group">
+                    <label>Email</label>
+                    <input type="email" id="new-user-email" placeholder="john@example.com" required>
+                </div>
+                <div class="input-group">
+                    <label>Password</label>
+                    <input type="password" id="new-user-password" placeholder="••••••••" required>
+                </div>
+                <div class="input-group">
+                    <label>Role</label>
+                    <select id="new-user-role" class="mselect" style="width: 100%; height: 38px; min-width: auto;">
+                        <option value="staff">Staff Member</option>
+                        <option value="admin">Administrator</option>
+                    </select>
+                </div>
+                <button type="submit" class="submit-btn" id="settings-add-user-btn" style="margin-top: 0; height: 38px;">Add User</button>
+            </form>
+
+            <!-- Edit User Form (Hidden by default) -->
+            <div id="settings-edit-user-area" style="display: none; margin-bottom: 30px; padding: 20px; background: var(--bg-surface); border-radius: 8px; border: 1px solid var(--primary-soft);">
+                <div style="font-weight: 700; margin-bottom: 15px; color: var(--primary); display: flex; justify-content: space-between;">
+                    <span>Edit User: <span id="edit-user-display-name"></span></span>
+                    <button type="button" id="cancel-edit-user" style="background:none; border:none; color:var(--text-muted); cursor:pointer;">✕ Cancel</button>
+                </div>
+                <form id="settings-edit-user-form" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; align-items: end;">
+                    <input type="hidden" id="edit-user-id">
+                    <div class="input-group">
+                        <label>Username</label>
+                        <input type="text" id="edit-user-username" required>
+                    </div>
+                    <div class="input-group">
+                        <label>Email</label>
+                        <input type="email" id="edit-user-email" required>
+                    </div>
+                    <div class="input-group">
+                        <label>Role</label>
+                        <select id="edit-user-role" class="mselect" style="width: 100%; height: 38px; min-width: auto;">
+                            <option value="staff">Staff Member</option>
+                            <option value="admin">Administrator</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="submit-btn" id="settings-save-user-btn" style="margin-top: 0; height: 38px;">Save Changes</button>
+                </form>
+            </div>
+
+            <!-- User List Table -->
+            <div class="products-table-wrap" style="box-shadow: none; border: none; margin-bottom: 0;">
+                <table id="users-table" class="dataTable no-footer" style="width: 100%;">
+                    <thead>
+                        <tr>
+                            <th>Username</th>
+                            <th>Email</th>
+                            <th>Role</th>
+                            <th style="text-align: right;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="users-table-body">
+                        <!-- Rows will be populated by renderer.js -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- System Monitor Card -->
+        <div class="content-card" id="settings-sysmon-card">
+            <div class="card-header" style="display:flex; justify-content:space-between; align-items:center;">
+                <span>System Logs & Health</span>
+                <button class="sysmon-btn" id="settings-sysmon-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect width="20" height="14" x="2" y="3" rx="2" />
+                        <line x1="8" x2="16" y1="21" y2="21" />
+                        <line x1="12" x2="12" y1="17" y2="21" />
+                    </svg>
+                    <span>Toggle System Monitor</span>
+                </button>
+            </div>
+            <div id="settings-sysmon-container" class="sysmon-log-view" style="display: none;">
+                <div id="settings-sysmon-content" style="white-space: pre-wrap;"></div>
+            </div>
         </div>
     </div>
 </div>

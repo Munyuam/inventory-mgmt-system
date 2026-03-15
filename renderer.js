@@ -474,117 +474,9 @@ const loadView = async (viewName) => {
                 window.initActivityView();
             }
         } else if (viewName === 'settings') {
-            const user = await window.api.getCurrentUser();
-            if (user) {
-                document.getElementById('settings-username').value = user.username || '';
-                document.getElementById('settings-email').value = user.email || '';
-
-                // RBAC: Hide System Monitor if not admin
-                const sysmonCard = document.getElementById('settings-sysmon-card');
-                if (sysmonCard) {
-                    sysmonCard.style.display = user.role === 'admin' ? 'block' : 'none';
-                }
+            if (typeof window.initSettingsView === 'function') {
+                await window.initSettingsView();
             }
-
-            // Profile Update Handler
-            document.getElementById('settings-update-profile-btn')?.addEventListener('click', async () => {
-                const btn = document.getElementById('settings-update-profile-btn');
-                const newUsername = document.getElementById('settings-username').value.trim();
-                const newEmail = document.getElementById('settings-email').value.trim();
-
-                if (!newUsername || !newEmail) {
-                    alert('Please provide both username and email.');
-                    return;
-                }
-
-                btn.textContent = 'Updating...';
-                btn.disabled = true;
-
-                const result = await window.api.updateProfile({ username: newUsername, email: newEmail });
-                if (result.success) {
-                    alert('Profile Updated Successfully!');
-                    updateGreeting({ username: newUsername, email: newEmail }); // Refresh header
-                } else {
-                    alert(`Update Failed: ${result.error}`);
-                }
-
-                btn.textContent = 'Update Profile';
-                btn.disabled = false;
-            });
-
-            // Password Change Handler
-            document.getElementById('settings-change-pwd-btn')?.addEventListener('click', async () => {
-                const btn = document.getElementById('settings-change-pwd-btn');
-                const curPass = document.getElementById('settings-cur-pass').value;
-                const newPass = document.getElementById('settings-new-pass').value;
-
-                if (!curPass || !newPass) {
-                    alert('Please provide both current and new passwords.');
-                    return;
-                }
-                if (newPass.length < 6) {
-                    alert('New password must be at least 6 characters long.');
-                    return;
-                }
-
-                btn.textContent = 'Changing...';
-                btn.disabled = true;
-
-                const result = await window.api.changePassword({ currentPassword: curPass, newPassword: newPass });
-                if (result.success) {
-                    alert('Password Changed Successfully! Please use it on your next login.');
-                    document.getElementById('settings-cur-pass').value = '';
-                    document.getElementById('settings-new-pass').value = '';
-                } else {
-                    alert(`Change Failed: ${result.error}`);
-                }
-
-                btn.textContent = 'Change Password';
-                btn.disabled = false;
-            });
-
-            // System Monitor Handler
-            document.getElementById('settings-sysmon-btn')?.addEventListener('click', async () => {
-                const container = document.getElementById('settings-sysmon-container');
-                const content = document.getElementById('settings-sysmon-content');
-                if (!container || !content) return;
-
-                // Toggle visibility
-                if (container.style.display !== 'none') {
-                    container.style.display = 'none';
-                    return;
-                }
-
-                container.style.display = 'flex';
-                content.innerHTML = '<span style="color:#aaa;">Fetching system logs...</span>';
-
-                try {
-                    const logs = await window.api.getAuditLogs();
-                    if (!logs || logs.length === 0) {
-                        content.innerHTML = '<span style="color:#888;">No logs found.</span>';
-                        return;
-                    }
-
-                    // Neatly format logs with color coding and structured classes
-                    const formattedLogs = logs.map(log => {
-                        const match = log.match(/^\[(.*?)\]\s+\[User:\s+(.*?)\]\s+Action:\s+(.*?)\s+-\s+(.*)$/);
-                        if (match) {
-                            const [_, time, user, action, details] = match;
-                            return `<div class="log-entry">
-                                <span class="log-time">[${time}]</span>
-                                <span class="log-user">${user}:</span>
-                                <span class="log-action">${action}</span>
-                                <span class="log-details">${details}</span>
-                            </div>`;
-                        }
-                        return `<div class="log-entry">${log}</div>`;
-                    }).join('');
-
-                    content.innerHTML = formattedLogs;
-                } catch (err) {
-                    content.innerHTML = `<span style="color:#f87171;">Failed to load logs: ${err.message}</span>`;
-                }
-            });
         }
         // Other views are self-contained
     } catch (error) {
@@ -1397,7 +1289,6 @@ const loadMovementSchedule = async (productId) => {
                 </tr>
             `;
         });
-
         tableBody.innerHTML = html;
         tableCard.style.display = 'block';
         placeholder.style.display = 'none';
@@ -1430,4 +1321,288 @@ const loadMovementSchedule = async (productId) => {
         console.error('Movement schedule error:', err);
     }
 };
+
+// --- Settings View Logic ---
+window.initSettingsView = async function() {
+    const user = await window.api.getCurrentUser();
+    if (!user) return;
+
+    // Populate Account placeholders
+    const uInput = document.getElementById('settings-username');
+    const eInput = document.getElementById('settings-email');
+    if (uInput) uInput.value = user.username || '';
+    if (eInput) eInput.value = user.email || '';
+
+    const isAdmin = user.role === 'admin';
+    const adminSection = document.getElementById('admin-settings-section');
+    if (adminSection) {
+        adminSection.style.display = isAdmin ? 'block' : 'none';
+        if (isAdmin) loadUsersList();
+    }
+
+    // Handlers
+    document.getElementById('settings-add-user-form')?.addEventListener('submit', onAddUser);
+    document.getElementById('settings-edit-user-form')?.addEventListener('submit', onEditUser);
+    document.getElementById('cancel-edit-user')?.addEventListener('click', () => {
+        document.getElementById('settings-edit-user-area').style.display = 'none';
+    });
+
+    // Profile Update Handler
+    document.getElementById('settings-update-profile-btn')?.addEventListener('click', async () => {
+        const btn = document.getElementById('settings-update-profile-btn');
+        const newUsername = document.getElementById('settings-username').value.trim();
+        const newEmail = document.getElementById('settings-email').value.trim();
+
+        if (!newUsername || !newEmail) {
+            alert('Please provide both username and email.');
+            return;
+        }
+
+        btn.textContent = 'Updating...';
+        btn.disabled = true;
+
+        const result = await window.api.updateProfile({ username: newUsername, email: newEmail });
+        if (result.success) {
+            alert('Profile Updated Successfully!');
+            updateGreeting({ username: newUsername, email: newEmail });
+        } else {
+            alert(`Update Failed: ${result.error}`);
+        }
+
+        btn.textContent = 'Update Profile';
+        btn.disabled = false;
+    });
+
+    // Password Change Handler
+    document.getElementById('settings-change-pwd-btn')?.addEventListener('click', async () => {
+        const btn = document.getElementById('settings-change-pwd-btn');
+        const curPass = document.getElementById('settings-cur-pass').value;
+        const newPass = document.getElementById('settings-new-pass').value;
+
+        if (!curPass || !newPass) {
+            alert('Please provide both current and new passwords.');
+            return;
+        }
+        if (newPass.length < 6) {
+            alert('New password must be at least 6 characters long.');
+            return;
+        }
+
+        btn.textContent = 'Changing...';
+        btn.disabled = true;
+
+        const result = await window.api.changePassword({ currentPassword: curPass, newPassword: newPass });
+        if (result.success) {
+            alert('Password Changed Successfully! Please use it on your next login.');
+            document.getElementById('settings-cur-pass').value = '';
+            document.getElementById('settings-new-pass').value = '';
+        } else {
+            alert(`Error: ${result.error}`);
+        }
+
+        btn.textContent = 'Change Password';
+        btn.disabled = false;
+    });
+
+    // System Monitor Handler
+    document.getElementById('settings-sysmon-btn')?.addEventListener('click', async () => {
+        const container = document.getElementById('settings-sysmon-container');
+        const content = document.getElementById('settings-sysmon-content');
+        if (!container || !content) {
+            // Fallback for if IDs are slightly different or missing
+            return;
+        }
+
+        // Toggle visibility
+        if (container.style.display !== 'none' && container.style.display !== '') {
+            container.style.display = 'none';
+            return;
+        }
+
+        container.style.display = 'flex';
+        content.innerHTML = '<span style="color:var(--text-muted);">Fetching system logs...</span>';
+
+        try {
+            const logs = await window.api.getAuditLogs();
+            if (!logs || logs.length === 0) {
+                content.innerHTML = '<span style="color:var(--text-muted);">No logs found.</span>';
+                return;
+            }
+
+            const formattedLogs = logs.map(log => {
+                const match = log.match(/^\[(.*?)\]\s+\[User:\s+(.*?)\]\s+Action:\s+(.*?)\s+-\s+(.*)$/);
+                if (match) {
+                    const [_, time, user, action, details] = match;
+                    return `<div class="log-entry">
+                        <span class="log-time">[${time}]</span>
+                        <span class="log-user">${user}:</span>
+                        <span class="log-action">${action}</span>
+                        <span class="log-details">${details}</span>
+                    </div>`;
+                }
+                return `<div class="log-entry">${log}</div>`;
+            }).reverse().join(''); // Show latest first
+
+            content.innerHTML = formattedLogs;
+        } catch (err) {
+            content.innerHTML = `<span style="color:var(--bg-error);">Failed to load logs: ${err.message}</span>`;
+        }
+    });
+};
+
+async function loadUsersList() {
+    try {
+        const users = await window.api.getUsers();
+        renderUsersTable(users);
+    } catch (err) {
+        console.error('Failed to load users:', err);
+    }
+}
+
+function renderUsersTable(users) {
+    const tbody = document.getElementById('users-table-body');
+    if (!tbody) return;
+    tbody.innerHTML = '';
+    
+    users.forEach(user => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td>${user.username}</td>
+            <td>${user.email}</td>
+            <td><span class="badge ${user.role === 'admin' ? 'badge-ok' : 'badge-low'}">${user.role}</span></td>
+            <td style="text-align: right;">
+                <button class="edit-user-btn action-btn-v2" data-id="${user.id}" data-username="${user.username}" data-email="${user.email}" data-role="${user.role}" title="Edit User">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>
+                </button>
+                <button class="delete-user-btn action-btn-v2 bg-error" data-id="${user.id}" data-username="${user.username}" title="Delete User" style="margin-left: 8px;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18m-2 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                </button>
+            </td>
+        `;
+        tbody.appendChild(tr);
+    });
+
+    // Re-init DataTable if it exists
+    if ($.fn.DataTable.isDataTable('#users-table')) {
+        $('#users-table').DataTable().destroy();
+    }
+    $('#users-table').DataTable({
+        pageLength: 5,
+        lengthMenu: [5, 10, 20],
+        order: [[0, 'asc']],
+        language: { search: "_INPUT_", searchPlaceholder: "Search users..." }
+    });
+
+    // Attach Action Handlers
+    document.querySelectorAll('.edit-user-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const { id, username, email, role } = e.currentTarget.dataset;
+            const editArea = document.getElementById('settings-edit-user-area');
+            document.getElementById('edit-user-id').value = id;
+            document.getElementById('edit-user-username').value = username;
+            document.getElementById('edit-user-email').value = email;
+            document.getElementById('edit-user-role').value = role;
+            document.getElementById('edit-user-display-name').textContent = username;
+            editArea.style.display = 'block';
+            editArea.scrollIntoView({ behavior: 'smooth' });
+        });
+    });
+
+    document.querySelectorAll('.delete-user-btn').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+            const { id, username } = e.currentTarget.dataset;
+            if (confirm(`Are you sure you want to delete user '${username}'?`)) {
+                const result = await window.api.adminDeleteUser(parseInt(id));
+                if (result.success) {
+                    loadUsersList();
+                    const feedback = document.getElementById('user-mgmt-feedback');
+                    if (feedback) {
+                        feedback.textContent = `User '${username}' deleted.`;
+                        feedback.className = 'auth-feedback success';
+                        feedback.style.display = 'block';
+                    }
+                } else {
+                    alert(result.error);
+                }
+            }
+        });
+    });
+}
+
+async function onAddUser(e) {
+    e.preventDefault();
+    const feedback = document.getElementById('user-mgmt-feedback');
+    const btn = document.getElementById('settings-add-user-btn');
+    
+    const username = document.getElementById('new-user-username').value.trim();
+    const email = document.getElementById('new-user-email').value.trim();
+    const password = document.getElementById('new-user-password').value;
+    const role = document.getElementById('new-user-role').value;
+
+    if (feedback) feedback.style.display = 'none';
+    btn.textContent = 'Adding...';
+    btn.disabled = true;
+
+    try {
+        const result = await window.api.adminAddUser({ username, email, password, role });
+        if (result.success) {
+            if (feedback) {
+                feedback.textContent = `User '${username}' added successfully!`;
+                feedback.className = 'auth-feedback success';
+                feedback.style.display = 'block';
+            }
+            document.getElementById('settings-add-user-form').reset();
+            loadUsersList();
+        } else {
+            if (feedback) {
+                feedback.textContent = `Error: ${result.error}`;
+                feedback.className = 'auth-feedback error';
+                feedback.style.display = 'block';
+            }
+        }
+    } catch (err) {
+        if (feedback) {
+            feedback.textContent = `Critical error: ${err.message}`;
+            feedback.className = 'auth-feedback error';
+            feedback.style.display = 'block';
+        }
+    } finally {
+        btn.textContent = 'Add User';
+        btn.disabled = false;
+    }
+}
+
+async function onEditUser(e) {
+    e.preventDefault();
+    const userId = document.getElementById('edit-user-id').value;
+    const username = document.getElementById('edit-user-username').value.trim();
+    const email = document.getElementById('edit-user-email').value.trim();
+    const role = document.getElementById('edit-user-role').value;
+    const feedback = document.getElementById('user-mgmt-feedback');
+    const btn = document.getElementById('settings-save-user-btn');
+
+    btn.textContent = 'Saving...';
+    btn.disabled = true;
+
+    try {
+        const result = await window.api.adminUpdateUser(parseInt(userId), { username, email, role });
+        if (result.success) {
+            if (feedback) {
+                feedback.textContent = `User '${username}' updated successfully!`;
+                feedback.className = 'auth-feedback success';
+                feedback.style.display = 'block';
+            }
+            document.getElementById('settings-edit-user-area').style.display = 'none';
+            loadUsersList();
+        } else {
+            alert(result.error);
+        }
+    } catch (err) {
+        alert('Error updating user: ' + err.message);
+    } finally {
+        btn.textContent = 'Save Changes';
+        btn.disabled = false;
+    }
+}
+
 

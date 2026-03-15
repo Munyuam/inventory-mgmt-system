@@ -32,13 +32,45 @@ app.whenReady().then(() => {
         return db.getTransactions(userDataPath);
     });
 
-    ipcMain.handle('auth-signup', async (event, { username, email, password }) => {
-        const result = await db.registerUser(userDataPath, username, email, password);
+    ipcMain.handle('admin-add-user', async (event, { username, email, password, role }) => {
+        if (!currentUser || currentUser.role !== 'admin') {
+            return { success: false, error: 'Unauthorized. Admin privileges required.' };
+        }
+        const result = await db.registerUser(userDataPath, username, email, password, role);
         if (result.success) {
-            currentUser = { username, email, role: 'staff' };
-            logAction(username, 'Account Created', `${username} registered with email: ${email}`);
-        } else {
-            logAction('Guest', 'Account Creation Failed', `Attempted username: ${username}, Error: ${result.error}`);
+            logAction(currentUser.username, 'Admin: Add User', `Admin ${currentUser.username} created new user: ${username} (${role})`);
+        }
+        return result;
+    });
+
+    ipcMain.handle('get-users', async () => {
+        if (!currentUser || currentUser.role !== 'admin') {
+            return [];
+        }
+        return db.getUsers(userDataPath);
+    });
+
+    ipcMain.handle('admin-update-user', async (event, { userId, data }) => {
+        if (!currentUser || currentUser.role !== 'admin') {
+            return { success: false, error: 'Unauthorized. Admin privileges required.' };
+        }
+        const result = await db.adminUpdateUser(userDataPath, userId, data);
+        if (result.success) {
+            logAction(currentUser.username, 'Admin: Update User', `Admin ${currentUser.username} updated user ID: ${userId}`);
+        }
+        return result;
+    });
+
+    ipcMain.handle('admin-delete-user', async (event, userId) => {
+        if (!currentUser || currentUser.role !== 'admin') {
+            return { success: false, error: 'Unauthorized. Admin privileges required.' };
+        }
+        if (currentUser.id === userId) {
+            return { success: false, error: 'You cannot delete your own account while logged in.' };
+        }
+        const result = await db.adminDeleteUser(userDataPath, userId);
+        if (result.success) {
+            logAction(currentUser.username, 'Admin: Delete User', `Admin ${currentUser.username} deleted user ID: ${userId}`);
         }
         return result;
     });
